@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
 
-    "name": "VK share to chat",
+    "name": "vk one click share",
     "description": "This extension add to standart button share new = 'Share to chat'",
     "version": "1.1",
 
