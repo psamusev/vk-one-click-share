@@ -6,7 +6,7 @@
     "version": "1.1",
 
     "permissions": [
-        "tabs", "storage","http://*/*", "https://*/*",  "management"
+        "tabs", "storage","http://*/*", "https://*/*"
     ],
     "background":{
         "scripts":["request_ExtSide.js","background.js"],
