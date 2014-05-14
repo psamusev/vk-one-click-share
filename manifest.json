@@ -1,0 +1,22 @@
+{
+    "manifest_version": 2,
+
+    "name": "VK share to chat",
+    "description": "This extension add to standart button share new = 'Share to chat'",
+    "version": "1.1",
+
+    "permissions": [
+        "tabs", "storage","http://*/*", "https://*/*",  "management"
+    ],
+    "background":{
+        "scripts":["request_ExtSide.js","background.js"],
+        "persistent": false
+    },
+    "content_scripts": [
+        {
+            "matches": [ "http://vk.com/*" ,"https://vk.com/*"],
+            "js": ["jquery.js","requests.js","view_content.js"],
+            "css" : ["content.css"]
+        }
+    ]
+}
