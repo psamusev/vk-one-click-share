@@ -3,10 +3,13 @@
 
     "name": "vk one click share",
     "description": "This extension add to standart button share new = 'Share to chat'",
-    "version": "1.1",
+    "version": "1.0.0",
 
     "permissions": [
         "tabs", "storage","http://*/*", "https://*/*"
+    ],
+    "web_accessible_resources":[
+        "share-icon-min.png"
     ],
     "background":{
         "scripts":["request_ExtSide.js","background.js"],
