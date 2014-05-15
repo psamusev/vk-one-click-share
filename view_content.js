@@ -21,11 +21,12 @@ function addShareToChatButton(){
 
 function sendMessageToGroup(id_record){
     var id = Number(localStorage.getItem('vk_chat_id'));
+    var vk_chat_flag = (localStorage.getItem('vk_chat_flag_ext') === 'true') ? true : false;
 
     vkRequest.sendRecord({
         chat_id:id,
         recordId:id_record,
-        chat_flag:$('#vk_chat_flag').prop("checked")
+        chat_flag:vk_chat_flag
     },function(){
         alert("success");
     },function(error){
@@ -41,12 +42,14 @@ function addSettingsRegion(){
                 '<div class="itemSettings">' +
                     '<label for="chat_id">Enter user ID(Or chat ID):</label>' +
                     '<input id="vk_chat_id" type="number" name="chat_id"/>' +
-                    '<input id="vk_chat_flag" type="checkbox"/ > Send to chat?' +
+                    '<input id="vk_chat_flag_ext" type="checkbox" /> Send to chat?' +
                     '<button id="apllyChatID"> Apply </button>' +
                 '</div>' +
                 '<div class="itemSettings">' +
                     '<button id="reinstallAuthToken">Reinstall token</button>' +
                     '<button id="resetToken">Reset token</button>' +
+                    '<button id="resetFlag">Reset chat flag</button>' +
+                    '<button id="resetChatId">Reset chat Id</button>' +
                 '</div>' +
             '</div>' +
             '<div class="vkExtIconSettings">' +
@@ -79,29 +82,20 @@ function addSettingsRegion(){
     });
 
     body.bind('click',function(){
-        if(!$(event.target).parent('.vkExtSettings')[0]){
+        if(!$(event.target).parent('.vkExtSettings')[0] && !$(event.target).parent('.vkExtSettings > .itemSettings')[0]){
             iconSetting.show();
             settings.hide();
         }
     });
-}
-
-function start(){
-
-    chrome.storage.local.get('vkAccessData', function(items) {
-        localStorage.setItem('auth_token',items.vkAccessData.token);
-    });
-
-    chrome.storage.local.get('vkChatId',function(result){
-        localStorage.setItem('vk_chat_id',result.vkChatId);
-    });
-
-    addShareToChatButton();
-    addSettingsRegion();
 
     $('#apllyChatID').click(function(){
 
-        var chat_id = $('vk_chat_id').val();
+        var chat_id = $('#vk_chat_id').val();
+        var chat_flag = $('#vk_chat_flag_ext').prop("checked");
+
+        chrome.storage.local.set({'vkChatFlag':chat_flag}, function() {
+            localStorage.setItem('vk_chat_flag_ext',chat_flag);
+        });
 
         chrome.storage.local.set({'vkChatId':chat_id}, function() {
             localStorage.setItem('vk_chat_id',chat_id);
@@ -112,15 +106,45 @@ function start(){
         chrome.storage.local.remove('vkAccessData');
     });
 
+    $('#resetFlag').click(function(){
+        chrome.storage.local.remove('vkChatFlag');
+    });
+
+    $('#resetChatId').click(function(){
+        chrome.storage.local.remove('vkChatId');
+    });
+
     $('#reinstallAuthToken').click(function(){
         chrome.runtime.sendMessage({msg:'reinstallToken'}, function (response) {
             alert(response.msg);
         });
     });
 }
-/*
+
+function start(){
+    addShareToChatButton();
+    addSettingsRegion();
+
+    chrome.storage.local.get('vkAccessData', function(items) {
+        localStorage.setItem('auth_token',items.vkAccessData.token);
+    });
+
+    chrome.storage.local.get('vkChatId',function(result){
+        localStorage.setItem('vk_chat_id',result.vkChatId);
+        $('#vk_chat_id').val(result.vkChatId);
+    });
+
+    chrome.storage.local.get('vkChatFlag',function(result){
+        var flag = (result.vkChatFlag !== undefined) ? result.vkChatFlag : true;
+        $('#vk_chat_flag_ext').prop("checked",flag);
+        localStorage.setItem('vk_chat_flag_ext',flag);
+    });
+
+
+}
+
 var interval = window.setInterval(function(){
     addShareToChatButton();
-},1000);*/
+},1000);
 
 start();
