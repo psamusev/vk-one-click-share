@@ -85,9 +85,11 @@ function addSettingsRegion(){
     });
 
     body.bind('click',function(){
-        if(!$(event.target).parent('.vkExtSettings')[0] && !$(event.target).parent('.vkExtSettings > .itemSettings')[0]){
-            iconSetting.show();
-            settings.hide();
+        if(!$(event.target).parent('.vkExtSettings')[0]
+            && !$(event.target).parent('.vkExtSettings > .itemSettings')[0]
+            && $(event.target).attr("class") !== 'vkExtSettings'){
+                iconSetting.show();
+                settings.hide();
         }
     });
 
