@@ -28,7 +28,10 @@ function sendMessageToGroup(id_record){
         recordId:id_record,
         chat_flag:vk_chat_flag
     },function(){
-        alert("success");
+        $('#vkExtNotificationView').show();
+        window.setTimeout(function(){
+            $('#vkExtNotificationView').fadeOut(1500);
+        },2000);
     },function(error){
         alert(error.error_msg);
     });
@@ -41,7 +44,7 @@ function addSettingsRegion(){
         .html('<div class="vkExtSettings">' +
                 '<div class="itemSettings">' +
                     '<label for="chat_id">Enter user ID(Or chat ID):</label>' +
-                    '<input id="vk_chat_id" type="number" name="chat_id"/>' +
+                    '<input id="vk_chat_id" type="number" name="chat_id" min="0" />' +
                     '<input id="vk_chat_flag_ext" type="checkbox" /> Send to chat?' +
                     '<button id="apllyChatID"> Apply </button>' +
                 '</div>' +
@@ -121,9 +124,18 @@ function addSettingsRegion(){
     });
 }
 
+function addNotificationView(){
+    var body = $('body');
+    $("<div></div>",{id:'vkExtNotificationView'})
+        .html('<div class="notification_title">Message sent</div>' +
+            '<div id="vkExtNotificationBody" class="notification_body">Your message have been sent</div>'
+    ).appendTo(body);
+}
+
 function start(){
     addShareToChatButton();
     addSettingsRegion();
+    addNotificationView();
 
     chrome.storage.local.get('vkAccessData', function(items) {
         localStorage.setItem('auth_token',items.vkAccessData.token);

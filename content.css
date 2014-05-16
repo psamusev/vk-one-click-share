@@ -24,6 +24,9 @@ div.shareToChat .post_share_icon{
     border: 3px solid #2B587A;
     border-radius: 5px;
     padding: 7px;
+    color: #45688E;
+    background-color: #DEE5EB;
+    font-weight: bold;
 }
 
 .vkExtIconSettings{
@@ -32,5 +35,30 @@ div.shareToChat .post_share_icon{
     left: 15px;
     opacity: 0.7;
     cursor: pointer;
+}
+
+#vkExtNotificationView{
+    display: none;
+    width: 390px;
+    height: 55px;
+    background-color: black;
+    opacity: 0.7;
+    position: fixed;
+    top:78px;
+    left: 478px;
+    border-radius: 6px;
+    color: white;
+    z-index: 1200;
+    padding-left: 20px;
+    padding-top: 20px;
+    font-size:1.09em;
+}
+
+.notification_title{
+    font-weight: bold;
+}
+
+.notification_body{
+    margin-top: 10px;
 }
 
