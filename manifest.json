@@ -2,7 +2,7 @@
     "manifest_version": 2,
 
     "name": "vk one click share",
-    "description": "This extension add to standart button share new = 'Share to chat'",
+    "description": "This extension add to standart button share new = 'Click to share'",
     "version": "1.0.0",
 
     "permissions": [
@@ -11,6 +11,11 @@
     "web_accessible_resources":[
         "share-icon-min.png"
     ],
+    "icons": {
+        "16": "share-icon-16.png",
+        "48": "share-icon-48.png",
+        "128": "share-icon-128.png"
+    },
     "background":{
         "scripts":["request_ExtSide.js","background.js"],
         "persistent": false
@@ -18,7 +23,7 @@
     "content_scripts": [
         {
             "matches": [ "http://vk.com/*" ,"https://vk.com/*"],
-            "js": ["jquery.js","requests.js","view_content.js"],
+            "js": ["jquery.min.js","requests.js","view_content.js"],
             "css" : ["content.css"]
         }
     ]

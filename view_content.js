@@ -12,7 +12,7 @@ function addShareToChatButton(){
                 on:{
                     click:sendMessageToGroup.bind(null,id_record)
                 }
-            }).html("<span class='post_share_link fl_l'>Share to Chat</span>" +
+            }).html("<span class='post_share_link fl_l'>Click to share</span>" +
                 "<i class='post_share_icon sp_main fl_l'></i> ")
                 .appendTo(wallRecord);
         }
@@ -21,7 +21,7 @@ function addShareToChatButton(){
 
 function sendMessageToGroup(id_record){
     var id = Number(localStorage.getItem('vk_chat_id'));
-    var vk_chat_flag = (localStorage.getItem('vk_chat_flag_ext') === 'true') ? true : false;
+    var vk_chat_flag = (localStorage.getItem('vk_chat_flag_ext') === 'true');
 
     vkRequest.sendRecord({
         chat_id:id,

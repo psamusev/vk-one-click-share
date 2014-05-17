@@ -25,7 +25,7 @@ div.shareToChat .post_share_icon{
     border-radius: 5px;
     padding: 7px;
     color: #45688E;
-    background-color: rgba(222,229,235,1);
+    background-color: rgba(222,229,235,0.5);
     font-weight: bold;
 }
 
