@@ -46,13 +46,16 @@ function addSettingsRegion(){
                     '<label for="chat_id">Enter user ID(Or chat ID):</label>' +
                     '<input id="vk_chat_id" type="number" name="chat_id" min="0" />' +
                     '<input id="vk_chat_flag_ext" type="checkbox" /> Send to chat?' +
-                    '<button id="apllyChatID"> Apply </button>' +
+                    '<div>' +
+                        '<button id="apllyChatID"> Apply </button>' +
+                        '<button id="reinstallAuthToken">Reinstall token</button>' +
+                    '</div>' +
                 '</div>' +
                 '<div class="itemSettings">' +
-                    '<button id="reinstallAuthToken">Reinstall token</button>' +
-                    '<button id="resetToken">Reset token</button>' +
+
+                    /*'<button id="resetToken">Reset token</button>' +
                     '<button id="resetFlag">Reset chat flag</button>' +
-                    '<button id="resetChatId">Reset chat Id</button>' +
+                    '<button id="resetChatId">Reset chat Id</button>' +*/
                 '</div>' +
             '</div>' +
             '<div class="vkExtIconSettings">' +
@@ -149,7 +152,7 @@ function start(){
     });
 
     chrome.storage.local.get('vkChatFlag',function(result){
-        var flag = (result.vkChatFlag !== undefined) ? result.vkChatFlag : true;
+        var flag = (result.vkChatFlag !== undefined) ? result.vkChatFlag : false;
         $('#vk_chat_flag_ext').prop("checked",flag);
         localStorage.setItem('vk_chat_flag_ext',flag);
     });
