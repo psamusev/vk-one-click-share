@@ -3,13 +3,14 @@
 
     "name": "vk one click share",
     "description": "This extension add to standart button share new = 'Click to share'",
-    "version": "1.0.0",
+    "version": "1.0.1",
 
     "permissions": [
         "tabs", "storage","http://*/*", "https://*/*"
     ],
     "web_accessible_resources":[
-        "share-icon-min.png"
+        "share-icon-min.png",
+        "jquery.min.map"
     ],
     "icons": {
         "16": "share-icon-16.png",

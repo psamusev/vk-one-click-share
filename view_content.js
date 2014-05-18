@@ -27,11 +27,16 @@ function sendMessageToGroup(id_record){
         chat_id:id,
         recordId:id_record,
         chat_flag:vk_chat_flag
-    },function(){
-        $('#vkExtNotificationView').show();
-        window.setTimeout(function(){
-            $('#vkExtNotificationView').fadeOut(1500);
-        },2000);
+    },function(response,one){
+        if(response.error){
+            alert(response.error.error_msg);
+        } else{
+            $('#vkExtNotificationView').show();
+            window.setTimeout(function(){
+                $('#vkExtNotificationView').fadeOut(1500);
+            },2000);
+        }
+
     },function(error){
         alert(error.error_msg);
     });
