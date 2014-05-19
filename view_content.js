@@ -130,6 +130,9 @@ function addSettingsRegion(){
     $('#reinstallAuthToken').click(function(){
         chrome.runtime.sendMessage({msg:'reinstallToken'}, function (response) {
             alert(response.msg);
+            chrome.storage.local.get('vkAccessData', function(items) {
+                localStorage.setItem('auth_token',items.vkAccessData.token);
+            });
         });
     });
 }
