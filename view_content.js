@@ -29,7 +29,7 @@ function sendMessageToGroup(id_record){
         chat_flag:vk_chat_flag
     },function(response,one){
         if(response.error){
-            alert(response.error.error_msg);
+            showErrorMessages(response.error);
         } else{
             $('#vkExtNotificationView').show();
             window.setTimeout(function(){
@@ -136,10 +136,38 @@ function addSettingsRegion(){
 
 function addNotificationView(){
     var body = $('body');
-    $("<div></div>",{id:'vkExtNotificationView'})
+    $("<div></div>",{id:'vkExtNotificationView',class:'vkExtNotificationView'})
         .html('<div class="notification_title">Message sent</div>' +
-            '<div id="vkExtNotificationBody" class="notification_body">Your message have been sent</div>'
+            '<div id="vkExtNotificationBody" class="notification_body">Your message has been sent</div>'
     ).appendTo(body);
+}
+
+function showErrorMessages(error){
+    var errorTitle = error.error_msg.replace(/:[A-Za-z ]+/g,'');
+    var errorMessage = (error.error_code === 1) ? '' : error.error_msg.replace(/[A-Za-z ]+:/g,'').trim(); + '<br>';
+    var body = $('body');
+    var message = $("<div></div>",{class:'vkExtNotificationView errorNotify'})
+        .html('<div class="notification_title">' + errorTitle + '</div>' +
+            '<div id="vkExtNotificationBody" class="notification_body">' + errorMessage + 'Click any place to close this message(it will be automatically closed after 5 sec.)</div>'
+    ).appendTo(body);
+
+    function closeErrorNotification(){
+        body.unbind('click',function(){
+            closeErrorNotification();
+        });
+        message.fadeOut(1500,function(){
+            message.remove();
+        });
+    }
+
+    body.bind('click',function(){
+       closeErrorNotification();
+    });
+
+    window.setTimeout(function(){
+        closeErrorNotification();
+    },5000);
+
 }
 
 function start(){
