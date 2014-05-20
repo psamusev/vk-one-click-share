@@ -146,8 +146,8 @@ function addNotificationView(){
 }
 
 function showErrorMessages(error){
-    var errorTitle = error.error_msg.replace(/:[A-Za-z ]+/g,'');
-    var errorMessage = (error.error_code === 1) ? '' : error.error_msg.replace(/[A-Za-z ]+:/g,'').trim(); + '<br>';
+    var errorTitle = error.error_msg.replace(/:.+/g,'');
+    var errorMessage = (error.error_code === 1) ? '' : error.error_msg.replace(/.+:/g,'').trim(); + '<br>';
     var body = $('body');
     var message = $("<div></div>",{class:'vkExtNotificationView errorNotify'})
         .html('<div class="notification_title">' + errorTitle + '</div>' +
