@@ -56,11 +56,6 @@ vkRequest.auth = function(callback){
                      }*/
 
                     chrome.storage.local.set({'vkAccessData': vkRequest.OAuthURL});
-                    chrome.storage.local.get('vkChatId',function(result){
-                        if(result.vkChatId === undefined){
-                            chrome.storage.local.set({'vkChatId': vkUserID});
-                        }
-                    });
                 }
             }
         };

@@ -10,7 +10,7 @@ function addShareToChatButton(){
             $("<div></div>",{
                 class:'shareToChat post_share fl_r',
                 on:{
-                    click:sendMessageToGroup.bind(null,id_record)
+                    click:shareRecord.bind(null,id_record)
                 }
             }).html("<span class='post_share_link fl_l'>Click to share</span>" +
                 "<i class='post_share_icon sp_main fl_l'></i> ")
@@ -19,10 +19,10 @@ function addShareToChatButton(){
     });
 }
 
-function sendMessageToGroup(id_record){
+function shareRecord(id_record){
     var id = Number(localStorage.getItem('vk_chat_id'));
-    var vk_chat_flag = (localStorage.getItem('vk_chat_flag_ext') === 'true');
-    var sendToWall = (id === Number(localStorage.getItem('user_id')));
+    var vk_chat_flag = (localStorage.getItem('vk_send_flag') === 'chat');
+    var sendToWall = (localStorage.getItem('vk_send_flag') === 'wall');
 
     if(sendToWall) {
         var notifyTitle = 'Record posted';
@@ -31,6 +31,9 @@ function sendMessageToGroup(id_record){
             recordId: id_record
         }, function (response) {
             if (response.error) {
+                if(response.error.error_code === 15){
+                    response.error.error_msg = "Record already posted: This record already posted to your wall."
+                }
                 showErrorMessage(response.error);
             } else {
                 showNotificationMessage(notifyTitle,notifyMessage)
@@ -51,6 +54,9 @@ function sendMessageToGroup(id_record){
             chat_flag: vk_chat_flag
         }, function (response, one) {
             if (response.error) {
+                if(response.error.error_code === 1){
+                    response.error.error_msg = "Message didn't send: This record can't be send. Please check 'sending option'"
+                }
                 showErrorMessage(response.error);
             } else {
                 showNotificationMessage(notifyTitle,notifyMessage);
@@ -71,19 +77,12 @@ function addSettingsRegion(){
     $("<div></div>",{id:'outerVkExtSettings'})
         .html('<div class="vkExtSettings">' +
                 '<div class="itemSettings">' +
-                    '<label for="chat_id">Enter user ID(Or chat ID):</label>' +
-                    '<input id="vk_chat_id" type="number" name="chat_id" min="0" />' +
-                    '<input id="vk_chat_flag_ext" type="checkbox" /> <span style="position: relative;top:-3px">Send to chat?</span>' +
-                    '<div>' +
-                        '<div id="apllyChatID" class="btn"> Apply </div>' +
-                        '<div id="reinstallAuthToken" class="btn">Reinstall token</div>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="itemSettings">' +
-
-                    /*'<button id="resetToken">Reset token</button>' +
-                    '<button id="resetFlag">Reset chat flag</button>' +
-                    '<button id="resetChatId">Reset chat Id</button>' +*/
+                    '<div>Enter user ID(Or chat ID):</div>' +
+                    '<input id="vk_chat_id" type="number" name="chat_id" min="0" value="0"/>' +
+                    '<div style="margin-top: 10px">Select "sending option":</div>' +
+                    '<div><input value="dialog" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Send to dialog</span></div>' +
+                    '<div><input value="chat" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Send to chat</span></div>' +
+                    '<div><input value="wall" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Post to wall</span></div>' +
                 '</div>' +
             '</div>' +
             '<div class="vkExtIconSettings">' +
@@ -116,46 +115,25 @@ function addSettingsRegion(){
     });
 
     body.bind('click',function(){
-        if(!$(event.target).parent('.vkExtSettings')[0]
-            && !$(event.target).parent('.vkExtSettings > .itemSettings')[0]
+        if(!$(event.target).parents('.vkExtSettings')[0]
             && $(event.target).attr("class") !== 'vkExtSettings'){
                 iconSetting.show();
                 settings.hide();
         }
     });
 
-    $('#apllyChatID').click(function(){
-
-        var chat_id = $('#vk_chat_id').val();
-        var chat_flag = $('#vk_chat_flag_ext').prop("checked");
-
-        chrome.storage.local.set({'vkChatFlag':chat_flag}, function() {
-            localStorage.setItem('vk_chat_flag_ext',chat_flag);
+    $('input:radio[name=sendFlag]').click(function(){
+        var chat_flag = $(this).val();
+        chrome.storage.local.set({'vkSendFlag':chat_flag}, function() {
+            localStorage.setItem('vk_send_flag',chat_flag);
         });
+    });
+
+    $('input[type=number][id=vk_chat_id]').bind('input',function(){
+        var chat_id = $(this).val();
 
         chrome.storage.local.set({'vkChatId':chat_id}, function() {
             localStorage.setItem('vk_chat_id',chat_id);
-        });
-    });
-
-    $('#resetToken').click(function(){
-        chrome.storage.local.remove('vkAccessData');
-    });
-
-    $('#resetFlag').click(function(){
-        chrome.storage.local.remove('vkChatFlag');
-    });
-
-    $('#resetChatId').click(function(){
-        chrome.storage.local.remove('vkChatId');
-    });
-
-    $('#reinstallAuthToken').click(function(){
-        chrome.runtime.sendMessage({msg:'reinstallToken'}, function (response) {
-            alert(response.msg);
-            chrome.storage.local.get('vkAccessData', function(items) {
-                localStorage.setItem('auth_token',items.vkAccessData.token);
-            });
         });
     });
 }
@@ -170,7 +148,7 @@ function addNotificationView(){
 
 function showErrorMessage(error){
     var errorTitle = error.error_msg.replace(/:.+/g,'');
-    var errorMessage = (error.error_code === 1) ? '' : error.error_msg.replace(/.+:/g,'').trim(); + '<br>';
+    var errorMessage = error.error_msg.replace(/.+:/g,'').trim() + '<br>';
     var body = $('body');
     var message = $("<div></div>",{class:'vkExtNotificationView errorNotify'})
         .html('<div class="notification_title">' + errorTitle + '</div>' +
@@ -208,19 +186,20 @@ function start(){
     addNotificationView();
 
     chrome.storage.local.get('vkAccessData', function(items) {
-        localStorage.setItem('user_id',items.vkAccessData.userId);
         localStorage.setItem('auth_token',items.vkAccessData.token);
     });
 
     chrome.storage.local.get('vkChatId',function(result){
         localStorage.setItem('vk_chat_id',result.vkChatId);
-        $('#vk_chat_id').val(result.vkChatId);
+        if(result.vkChatId !== undefined) {
+            $('#vk_chat_id').val(result.vkChatId);
+        }
     });
 
-    chrome.storage.local.get('vkChatFlag',function(result){
-        var flag = (result.vkChatFlag !== undefined) ? result.vkChatFlag : false;
-        $('#vk_chat_flag_ext').prop("checked",flag);
-        localStorage.setItem('vk_chat_flag_ext',flag);
+    chrome.storage.local.get('vkSendFlag',function(result){
+        var flag = (result.vkSendFlag !== undefined) ? result.vkSendFlag : 'wall';
+        $('input:radio[name=sendFlag][value=' + flag + ']').attr('checked', 'checked');
+        localStorage.setItem('vk_send_flag',flag);
     });
 
 
