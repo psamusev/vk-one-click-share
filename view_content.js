@@ -25,13 +25,15 @@ function sendMessageToGroup(id_record){
     var sendToWall = (id === Number(localStorage.getItem('user_id')));
 
     if(sendToWall) {
+        var notifyTitle = 'Record posted';
+        var notifyMessage = 'Record has posted to your wall';
         vkRequest.postRecord({
             recordId: id_record
         }, function (response) {
             if (response.error) {
-                showErrorMessages(response.error);
+                showErrorMessage(response.error);
             } else {
-                $('#vkExtNotificationView').show();
+                showNotificationMessage(notifyTitle,notifyMessage)
                 window.setTimeout(function () {
                     $('#vkExtNotificationView').fadeOut(1500);
                 }, 2000);
@@ -41,15 +43,17 @@ function sendMessageToGroup(id_record){
         });
     } else {
 
+        var notifyTitle = 'Message sent';
+        var notifyMessage = 'Your message has been sent';
         vkRequest.sendRecord({
             chat_id: id,
             recordId: id_record,
             chat_flag: vk_chat_flag
         }, function (response, one) {
             if (response.error) {
-                showErrorMessages(response.error);
+                showErrorMessage(response.error);
             } else {
-                $('#vkExtNotificationView').show();
+                showNotificationMessage(notifyTitle,notifyMessage);
                 window.setTimeout(function () {
                     $('#vkExtNotificationView').fadeOut(1500);
                 }, 2000);
@@ -164,7 +168,7 @@ function addNotificationView(){
     ).appendTo(body);
 }
 
-function showErrorMessages(error){
+function showErrorMessage(error){
     var errorTitle = error.error_msg.replace(/:.+/g,'');
     var errorMessage = (error.error_code === 1) ? '' : error.error_msg.replace(/.+:/g,'').trim(); + '<br>';
     var body = $('body');
@@ -190,6 +194,12 @@ function showErrorMessages(error){
         closeErrorNotification();
     },5000);
 
+}
+
+function showNotificationMessage(title, message){
+    $('#vkExtNotificationView').children('.notification_title').text(title);
+    $('#vkExtNotificationView').children('.notification_body').text(message);
+    $('#vkExtNotificationView').show();
 }
 
 function start(){

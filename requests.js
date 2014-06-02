@@ -30,7 +30,7 @@ vkRequest.postRecord = function(data,successCallback,errorCallback){
         record = '&object=wall' + data.recordId;
     var url = server + method + record + access_token;
     request(url,successCallback,errorCallback);
-}
+};
 
 function request(url,successCallback,errorCallback){
     $.ajax({
