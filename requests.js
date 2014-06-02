@@ -18,11 +18,19 @@ vkRequest.sendRecord = function(data,successCallback,errorCallback){
         method = 'messages.send?',
         chat_id = (data.chat_flag)? 'chat_id=' + data.chat_id : 'user_id=' + data.chat_id,
         access_token = '&access_token=' + localStorage.getItem('auth_token'),
-        attachment = '&attachment=wall' + data.recordId;
-    var url = server + method + chat_id + attachment + access_token;
-    console.log(data.recordId);
+        record = '&attachment=wall' + data.recordId;
+    var url = server + method + chat_id + record + access_token;
     request(url,successCallback,errorCallback);
 };
+
+vkRequest.postRecord = function(data,successCallback,errorCallback){
+    var server = 'https://api.vk.com/method/',
+        method = 'wall.repost?',
+        access_token = '&access_token=' + localStorage.getItem('auth_token'),
+        record = '&object=wall' + data.recordId;
+    var url = server + method + record + access_token;
+    request(url,successCallback,errorCallback);
+}
 
 function request(url,successCallback,errorCallback){
     $.ajax({

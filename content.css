@@ -27,11 +27,11 @@ div.shareToChat .post_share_icon{
 
 .vkExtSettings{
     display: none;
-    border: 3px solid #2B587A;
+    border: 1px solid black;
     border-radius: 5px;
     padding: 7px;
-    color: #45688E;
-    background-color: rgba(222,229,235,0.5);
+    color: white;
+    background-color: rgba(0,0,0,0.5);
     font-weight: bold;
 }
 
@@ -82,5 +82,18 @@ div.shareToChat .post_share_icon{
 
 .errorNotify .notification_body{
     color:rgb(64,64,64)
+}
+
+.btn{
+    padding: 6px;
+    background:white;
+    color:black;
+    border-radius: 4px;
+    display:inline-block;
+    margin:4px;
+}
+
+.btn:hover{
+    cursor: pointer;
 }
 

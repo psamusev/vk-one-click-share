@@ -5,7 +5,7 @@ vkRequest.OAuthURL = vkRequest.OAuthURL || {};
 
 vkRequest.auth = function(callback){
     var client_id = 4354846,
-        scope = 'messages offline',
+        scope = 'messages wall offline docs',
         redirect_uri = 'http%3A%2F%2Foauth.vk.com%2Fblank.html',
         display = 'page',
         response_type = 'token';

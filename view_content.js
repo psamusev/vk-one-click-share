@@ -22,24 +22,43 @@ function addShareToChatButton(){
 function sendMessageToGroup(id_record){
     var id = Number(localStorage.getItem('vk_chat_id'));
     var vk_chat_flag = (localStorage.getItem('vk_chat_flag_ext') === 'true');
+    var sendToWall = (id === Number(localStorage.getItem('user_id')));
 
-    vkRequest.sendRecord({
-        chat_id:id,
-        recordId:id_record,
-        chat_flag:vk_chat_flag
-    },function(response,one){
-        if(response.error){
-            showErrorMessages(response.error);
-        } else{
-            $('#vkExtNotificationView').show();
-            window.setTimeout(function(){
-                $('#vkExtNotificationView').fadeOut(1500);
-            },2000);
-        }
+    if(sendToWall) {
+        vkRequest.postRecord({
+            recordId: id_record
+        }, function (response) {
+            if (response.error) {
+                showErrorMessages(response.error);
+            } else {
+                $('#vkExtNotificationView').show();
+                window.setTimeout(function () {
+                    $('#vkExtNotificationView').fadeOut(1500);
+                }, 2000);
+            }
+        }, function (error) {
+            alert(error.error_msg);
+        });
+    } else {
 
-    },function(error){
-        alert(error.error_msg);
-    });
+        vkRequest.sendRecord({
+            chat_id: id,
+            recordId: id_record,
+            chat_flag: vk_chat_flag
+        }, function (response, one) {
+            if (response.error) {
+                showErrorMessages(response.error);
+            } else {
+                $('#vkExtNotificationView').show();
+                window.setTimeout(function () {
+                    $('#vkExtNotificationView').fadeOut(1500);
+                }, 2000);
+            }
+
+        }, function (error) {
+            alert(error.error_msg);
+        });
+    }
 }
 
 function addSettingsRegion(){
@@ -50,10 +69,10 @@ function addSettingsRegion(){
                 '<div class="itemSettings">' +
                     '<label for="chat_id">Enter user ID(Or chat ID):</label>' +
                     '<input id="vk_chat_id" type="number" name="chat_id" min="0" />' +
-                    '<input id="vk_chat_flag_ext" type="checkbox" /> Send to chat?' +
+                    '<input id="vk_chat_flag_ext" type="checkbox" /> <span style="position: relative;top:-3px">Send to chat?</span>' +
                     '<div>' +
-                        '<button id="apllyChatID"> Apply </button>' +
-                        '<button id="reinstallAuthToken">Reinstall token</button>' +
+                        '<div id="apllyChatID" class="btn"> Apply </div>' +
+                        '<div id="reinstallAuthToken" class="btn">Reinstall token</div>' +
                     '</div>' +
                 '</div>' +
                 '<div class="itemSettings">' +
@@ -179,6 +198,7 @@ function start(){
     addNotificationView();
 
     chrome.storage.local.get('vkAccessData', function(items) {
+        localStorage.setItem('user_id',items.vkAccessData.userId);
         localStorage.setItem('auth_token',items.vkAccessData.token);
     });
 
