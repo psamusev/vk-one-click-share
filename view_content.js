@@ -86,7 +86,9 @@ function addSettingsRegion(){
 
                         '<div id="showContactListBtn" class="input_arr"></div>' +
                         '<input class="input_text" id="vk_recipient" type="text" name="recipient" placeholder="Enter user name"/>' +
-                        '<div id="contactList" style="display: none"></div>' +
+                        '<div id="contactList" style="display: none">' +
+                            '<div class="contactListItem notFound">Not found contact</div>' +
+                        '</div>' +
                     '</div>' +
                     '<div class="btn" id="addNewContactBtn">Add new contact</div>' +
                 '</div>' +
@@ -129,6 +131,7 @@ function addSettingsRegion(){
             $('#contactList').hide();
         } else{
             $('#contactList').show();
+            filterContactList($('#vk_recipient').val());
         }
 
     });
@@ -158,11 +161,16 @@ function addSettingsRegion(){
     });
 
     $('#vk_recipient').bind('input',function(){
+        $('#contactList > .notFound').hide();
         var chat_id = $(this).val();
-
+        filterContactList(chat_id);
         chrome.storage.local.set({'vkChatId':chat_id}, function() {
             localStorage.setItem('vk_chat_id',chat_id);
         });
+    });
+
+    $('#vk_recipient').bind('focus',function(){
+        $('#contactList').show();
     });
 }
 
@@ -197,9 +205,11 @@ function addContactDialog(){
     $('#box_layer_wrap').bind('click',function(){
         if(!$(event.target).parents('#contactDialog')[0]
             && $(event.target).attr("id") !== 'contactDialog'){
-            $('#contactDialog').hide();
-            $('#searchResult').remove('.searchResultItem');
-            $('#box_layer_wrap').hide();
+            if($('#contactDialog').is(':visible')){
+                $('#box_layer_wrap').hide();
+                $('#contactDialog').hide();
+                $('#searchResult').children('.searchResultItem').remove();
+            }
         }
     });
 
@@ -210,9 +220,11 @@ function addContactDialog(){
     });
 
     $('.box_close').bind('click',function(){
-        $('#contactDialog').hide();
-        $('#searchResult').children('.searchResultItem').remove();
-        $('#box_layer_wrap').hide();
+        if($('#contactDialog').is(':visible')){
+            $('#box_layer_wrap').hide();
+            $('#contactDialog').hide();
+            $('#searchResult').children('.searchResultItem').remove();
+        }
     });
 
     $('#searchContact').bind('click',function(){
@@ -254,6 +266,7 @@ function addContactDialog(){
                                 .text('This contact already added');
                         } else {
                             window.contactList.push(item);
+                            chrome.storage.local.set({'vkContactList': window.contactList});
                             var contactList = $('#contactList');
                             var contactListItem = $('<div class="contactListItem">' +
                                 '<div><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
@@ -274,6 +287,30 @@ function addContactDialog(){
 
         })
     })
+}
+
+function filterContactList(val){
+    if(val === ''){
+        $('#contactList > .contactListItem').each(function(){
+            if($(this).attr('class').indexOf('notFound') < 0){
+                $(this).show();
+            }
+        });
+    } else {
+        var countHide = 0;
+        $('#contactList > .contactListItem').each(function () {
+            var text = $(this).children('.text_item').text().toLowerCase();
+            if (text.indexOf(val) >= 0) {
+                $(this).show()
+            } else {
+                $(this).hide();
+                countHide++;
+            }
+        });
+        if (countHide - 1 === window.contactList.length) {
+            $('#contactList > .notFound').show();
+        }
+    }
 }
 
 function fillContactList(){

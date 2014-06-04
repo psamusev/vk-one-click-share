@@ -60,6 +60,7 @@ div.shareToChat .post_share_icon{
     outline: 0px;
     height: 14px;
     position: relative;
+    width: 205px;
 }
 
 .inputContainer{
@@ -165,7 +166,7 @@ div.shareToChat .post_share_icon{
 
 #contactList{
     overflow-y: scroll;
-    height: 250px;
+    max-height: 250px;
     background: white;/*background:rgb(127,127,127);*/
     color: black;
     z-index: 200;
@@ -187,6 +188,10 @@ div.shareToChat .post_share_icon{
 
 .contactListItem div{
     display: inline-block;
+}
+
+.notFound{
+    display: none;
 }
 
 .contactListItem .text_item{
