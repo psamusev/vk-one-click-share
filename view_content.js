@@ -77,12 +77,18 @@ function addSettingsRegion(){
     $("<div></div>",{id:'outerVkExtSettings'})
         .html('<div class="vkExtSettings">' +
                 '<div class="itemSettings">' +
-                    '<div>Enter user ID(Or chat ID):</div>' +
-                    '<input id="vk_chat_id" type="number" name="chat_id" min="0" value="0"/>' +
+                    //'<input id="vk_chat_id" type="number" name="chat_id" min="0" value="0"/>' +
                     '<div style="margin-top: 10px">Select "sending option":</div>' +
                     '<div><input value="dialog" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Send to dialog</span></div>' +
                     '<div><input value="chat" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Send to chat</span></div>' +
                     '<div><input value="wall" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Post to wall</span></div>' +
+                    '<div class="inputContainer">' +
+
+                        '<div id="showContactListBtn" class="input_arr"></div>' +
+                        '<input class="input_text" id="vk_recipient" type="text" name="recipient" placeholder="Enter user name"/>' +
+                        '<div id="contactList" style="display: none"></div>' +
+                    '</div>' +
+                    '<div class="btn" id="addNewContactBtn">Add new contact</div>' +
                 '</div>' +
             '</div>' +
             '<div class="vkExtIconSettings">' +
@@ -114,6 +120,19 @@ function addSettingsRegion(){
 
     });
 
+    $('#addNewContactBtn').bind('click',function(){
+        showAddContactDialog();
+    });
+
+    $('#showContactListBtn').bind('click',function(){
+        if($('#contactList').is(':visible')){
+            $('#contactList').hide();
+        } else{
+            $('#contactList').show();
+        }
+
+    });
+
     body.bind('click',function(){
         if(!$(event.target).parents('.vkExtSettings')[0]
             && $(event.target).attr("class") !== 'vkExtSettings'){
@@ -124,12 +143,21 @@ function addSettingsRegion(){
 
     $('input:radio[name=sendFlag]').click(function(){
         var chat_flag = $(this).val();
+        if(chat_flag === "chat"){
+            $('.inputContainer').show();
+            $('#vk_recipient').attr('placeholder','Enter chat name');
+        } else if(chat_flag === 'dialog'){
+            $('.inputContainer').show();
+            $('#vk_recipient').attr('placeholder','Enter user name');
+        } else{
+            $('.inputContainer').hide();
+        }
         chrome.storage.local.set({'vkSendFlag':chat_flag}, function() {
             localStorage.setItem('vk_send_flag',chat_flag);
         });
     });
 
-    $('input[type=number][id=vk_chat_id]').bind('input',function(){
+    $('#vk_recipient').bind('input',function(){
         var chat_id = $(this).val();
 
         chrome.storage.local.set({'vkChatId':chat_id}, function() {
@@ -144,6 +172,127 @@ function addNotificationView(){
         .html('<div class="notification_title">Message sent</div>' +
             '<div id="vkExtNotificationBody" class="notification_body">Your message has been sent</div>'
     ).appendTo(body);
+}
+
+function addContactDialog(){
+    $("<div></div>",{id:'contactDialog'})
+        .html('<div class="box_dialog">' +
+            '<div class="header">' +
+                '<div class="title">Find Contact</div>' +
+                '<div class="fl_r box_close">Close</div>' +
+            '</div>' +
+            '<div class="inner">' +
+                '<div>' +
+                    '<span><strong>Enter user ID(chat ID):</strong></span>' +
+                    '<input id="vk_user_chat_id" type="number" value="1" min="1" />' +
+                '</div>' +
+                '<div id="searchContact" class="button_blue" style="top:-7px;margin-left: 10px"><button>Find</button></div>' +
+            '</div>' +
+            '<div id="searchResult"></div>' +
+            '</div>')
+        .appendTo($('#box_layer_wrap'));
+
+    $('#box_layer_wrap').bind('click',function(){
+        if(!$(event.target).parents('#contactDialog')[0]
+            && $(event.target).attr("id") !== 'contactDialog'){
+            $('#contactDialog').hide();
+            $('#searchResult').remove('.searchResultItem');
+            $('#box_layer_wrap').hide();
+        }
+    });
+
+    $('.box_close').bind('click',function(){
+        $('#contactDialog').hide();
+        $('#searchResult').remove('.searchResultItem');
+        $('#box_layer_wrap').hide();
+    });
+
+    $('#searchContact').bind('click',function(){
+        vkRequest.findUser({
+            id:Number($('#vk_user_chat_id').val()),
+            fields:'photo_50'
+        },function(response){
+            if(response.error){
+                alert(response.error.error_msg);
+            } else{
+                var item = response.response[0];
+                var resultContainer = $('#searchResult');
+                $('<div class="searchResultItem">' +
+                    '<div><img src="' + item.photo_50 + '"/> </div>' +
+                    '<div class="text_item"><strong>' + item.first_name + ' ' + item.last_name + '</strong></div>' +
+                    '<div id="addToContact" class="button_blue" style="top:-30px;margin-left: 10px"><button>Add to contact</button></div>' +
+                    '<div class="notify"></div>' +
+                    '</div>')
+                    .appendTo(resultContainer);
+                $('#addToContact').bind('click',{ID:item.uid},function(event){
+                    var res = false;
+                    window.contactList.forEach(function(item){
+                        if(item.uid === event.data.ID){
+                            res = true;
+                        }
+                    });
+                    if(res){
+                        $('#searchResult').children().children('.notify')
+                            .attr('class','notify notify_error_text')
+                            .text('This contact already added');
+                    } else {
+                        window.contactList.push(item);
+                        var contactList = $('#contactList');
+                        var contactListItem = $('<div class="contactListItem">' +
+                            '<div><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
+                            + '</div>');
+                        contactList.append(contactListItem);
+                        $('#searchResult').children().children('.notify')
+                            .attr('class','notify notify_success_text')
+                            .text('Contact added');
+                    }
+                })
+            }
+        },function(error){
+
+        })
+    })
+}
+
+function fillContactList(){
+    chrome.storage.local.get('vkContactList',function(result){
+
+        function fill(items){
+            var contactList = $('#contactList');
+            items.forEach(function(item){
+                var contactListItem = $('<div class="contactListItem">' +
+                    '<div><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
+                    + '</div>');
+                contactList.append(contactListItem);
+            });
+        };
+
+        window.contactList = result.vkContactList;
+        if(result.vkContactList === undefined){
+            vkRequest.getFriends({
+                order:'hints',
+                fields:'photo_50'
+            },function(response){
+                if(response.error){
+                    alert(response.error.error_msg);
+                } else{
+                    window.contactList = response.response;
+                    chrome.storage.local.set({'vkContactList': response.response});
+                    fill(response.response);
+                }
+            },function(error){
+
+            })
+        } else {
+            fill(result.vkContactList);
+        }
+
+    });
+}
+
+function showAddContactDialog(){
+    $('#box_layer_wrap').css('background-color','rgba(0,0,0,0.5)').show();
+    $('#contactDialog').show();
 }
 
 function showErrorMessage(error){
@@ -184,6 +333,8 @@ function start(){
     addShareToChatButton();
     addSettingsRegion();
     addNotificationView();
+    addContactDialog();
+    fillContactList();
 
     chrome.storage.local.get('vkAccessData', function(items) {
         localStorage.setItem('auth_token',items.vkAccessData.token);
@@ -192,7 +343,7 @@ function start(){
     chrome.storage.local.get('vkChatId',function(result){
         localStorage.setItem('vk_chat_id',result.vkChatId);
         if(result.vkChatId !== undefined) {
-            $('#vk_chat_id').val(result.vkChatId);
+//            $('#vk_chat_id').val(result.vkChatId);
         }
     });
 

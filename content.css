@@ -21,7 +21,7 @@ div.shareToChat .post_share_icon{
     position: fixed;
     top: 120px;
     right: 0;
-    width: 180px;
+    width: 250px;
     height: 85px;
 }
 
@@ -41,6 +41,34 @@ div.shareToChat .post_share_icon{
     left: 15px;
     opacity: 0.7;
     cursor: pointer;
+}
+
+.input_arr{
+    float: right;
+    height: 24px;
+    width: 21px;
+    overflow: hidden;
+    cursor: pointer;
+    background: url(https://vk.com/images/wide_dd.gif) no-repeat 0px 0px;
+    position: relative;
+    top:-3px;
+}
+
+.input_text{
+    float: left;
+    border:0px;
+    outline: 0px;
+    height: 14px;
+    position: relative;
+}
+
+.inputContainer{
+    background: white;
+    border: 1px solid #C0CAD5;
+    overflow: visible !important;
+    padding: 2px;
+    position: relative;
+    height: 18px;
 }
 
 /*Notification style*/
@@ -91,9 +119,107 @@ div.shareToChat .post_share_icon{
     border-radius: 4px;
     display:inline-block;
     margin:4px;
+    cursor: pointer;
+    margin-left: 0px;
+    font-weight: bold;
 }
 
-.btn:hover{
+.box_dialog{
+    background: #F7F7F7;
+    height: 150px;
+}
+
+.box_close{
+    color:#C7D7E9;
+    padding: 9px 26px 18px;
+    margin: -22px -10px -11px;
     cursor: pointer;
+    font-weight: 100;
+}
+
+.box_close:hover{
+    text-decoration: underline;
+}
+
+#contactDialog{
+    display: none;
+    width: 500px;
+    margin: 100px auto 0 auto;
+}
+
+#contactDialog .header{
+    color: white;
+    font-weight: bold;
+    background: #597BA5;
+    padding: 10px 10px 11px;
+}
+
+#contactDialog .inner{
+    padding-top: 10px;
+    padding-left: 20px;
+}
+
+#contactDialog .inner div{
+    display: inline-block;
+}
+
+#contactList{
+    overflow-y: scroll;
+    height: 250px;
+    background: white;/*background:rgb(127,127,127);*/
+    color: black;
+    z-index: 200;
+    width: 232px;
+    border: 1px solid #C0CAD5;
+    position: relative;
+    left: -3px;
+}
+
+.contactListItem{
+    padding: 5px;
+    border-bottom: 1px solid #C0CAD5;
+    cursor: pointer;
+}
+
+.contactListItem:hover{
+    background: rgb(241,245,249);
+}
+
+.contactListItem div{
+    display: inline-block;
+}
+
+.contactListItem .text_item{
+    position: relative;
+    top: -20px;
+    margin-left: 10px;
+}
+
+.searchResultItem{
+    padding-left: 20px;
+}
+
+.searchResultItem div{
+    display: inline-block;
+}
+
+.searchResultItem .text_item{
+    position: relative;
+    top: -20px;
+    margin-left: 10px;
+}
+
+.notify{
+    position: relative;
+    top: -25px;
+    margin-left: 10px;
+}
+
+.notify_error_text{
+    color:rgb(155,20,20);
+}
+
+.notify_success_text{
+    color:rgb(37,169,94);
 }
 

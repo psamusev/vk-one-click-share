@@ -6,10 +6,30 @@ vkRequest = window.vkRequest || {};
 
 vkRequest.getChat = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
-        method = 'messages.getChat',
+        method = 'messages.getChat?',
         chat_id = 'chat_id=' + data.id,
-        access_token = 'access_token=' + data.token;
+        access_token = '&access_token=' + data.token;
     var url = server + method + chat_id + access_token;
+    request(url,successCallback,errorCallback);
+};
+
+vkRequest.findUser = function(data,successCallback,errorCallback){
+    var server = 'https://api.vk.com/method/',
+        method = 'users.get?',
+        user_id = 'user_ids=' + data.id,
+        fields = '&fields=' + data.fields,
+        access_token = '&access_token=' + localStorage.getItem('auth_token');
+    var url = server + method + user_id + fields + access_token;
+    request(url,successCallback,errorCallback);
+};
+
+vkRequest.getFriends = function(data,successCallback,errorCallback){
+    var server = 'https://api.vk.com/method/',
+        method = 'friends.get?',
+        order = 'order=' + data.order,
+        fields = '&fields=' + data.fields,
+        access_token = '&access_token=' + localStorage.getItem('auth_token');
+    var url = server + method + order + fields + access_token;
     request(url,successCallback,errorCallback);
 };
 
