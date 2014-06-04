@@ -189,6 +189,8 @@ function addContactDialog(){
                 '<div id="searchContact" class="button_blue" style="top:-7px;margin-left: 10px"><button>Find</button></div>' +
             '</div>' +
             '<div id="searchResult"></div>' +
+            '<div id="errorSearch"></div>' +
+            '<div class="loading_spinner"><img src="' + chrome.extension.getURL("loading.gif")+ '" /> </div>' +
             '</div>')
         .appendTo($('#box_layer_wrap'));
 
@@ -201,52 +203,72 @@ function addContactDialog(){
         }
     });
 
+    $('#vk_user_chat_id').bind('keyup',function(){
+        if(event.keyIdentifier === 'Enter'){
+            $('#searchContact').click();
+        }
+    });
+
     $('.box_close').bind('click',function(){
         $('#contactDialog').hide();
-        $('#searchResult').remove('.searchResultItem');
+        $('#searchResult').children('.searchResultItem').remove();
         $('#box_layer_wrap').hide();
     });
 
     $('#searchContact').bind('click',function(){
+        $('#errorSearch').hide();
+        $('.loading_spinner').show();
+        $('#searchResult').children('.searchResultItem').remove();
         vkRequest.findUser({
             id:Number($('#vk_user_chat_id').val()),
             fields:'photo_50'
         },function(response){
+            $('.loading_spinner').hide();
             if(response.error){
-                alert(response.error.error_msg);
+                if(response.error.error_code === 113){
+                    $('#errorSearch').show().text('Your query returned no results.');
+                } else{
+                    alert(response.error.error_msg);
+                }
             } else{
                 var item = response.response[0];
-                var resultContainer = $('#searchResult');
-                $('<div class="searchResultItem">' +
-                    '<div><img src="' + item.photo_50 + '"/> </div>' +
-                    '<div class="text_item"><strong>' + item.first_name + ' ' + item.last_name + '</strong></div>' +
-                    '<div id="addToContact" class="button_blue" style="top:-30px;margin-left: 10px"><button>Add to contact</button></div>' +
-                    '<div class="notify"></div>' +
-                    '</div>')
-                    .appendTo(resultContainer);
-                $('#addToContact').bind('click',{ID:item.uid},function(event){
-                    var res = false;
-                    window.contactList.forEach(function(item){
-                        if(item.uid === event.data.ID){
-                            res = true;
+                if(item && item.deactivated === undefined) {
+                    var resultContainer = $('#searchResult');
+                    $('<div class="searchResultItem">' +
+                        '<div><img src="' + item.photo_50 + '"/> </div>' +
+                        '<div class="text_item"><strong>' + item.first_name + ' ' + item.last_name + '</strong></div>' +
+                        '<div id="addToContact" class="button_blue" style="top:-30px;margin-left: 10px"><button>Add to contact</button></div>' +
+                        '<div class="notify"></div>' +
+                        '</div>')
+                        .appendTo(resultContainer);
+                    $('#addToContact').bind('click', {ID: item.uid}, function (event) {
+                        var res = false;
+                        window.contactList.forEach(function (item) {
+                            if (item.uid === event.data.ID) {
+                                res = true;
+                            }
+                        });
+                        if (res) {
+                            $('#searchResult').children().children('.notify')
+                                .attr('class', 'notify notify_error_text')
+                                .text('This contact already added');
+                        } else {
+                            window.contactList.push(item);
+                            var contactList = $('#contactList');
+                            var contactListItem = $('<div class="contactListItem">' +
+                                '<div><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
+                                + '</div>');
+                            contactList.append(contactListItem);
+                            $('#searchResult').children().children('.notify')
+                                .attr('class', 'notify notify_success_text')
+                                .text('Contact added');
                         }
-                    });
-                    if(res){
-                        $('#searchResult').children().children('.notify')
-                            .attr('class','notify notify_error_text')
-                            .text('This contact already added');
-                    } else {
-                        window.contactList.push(item);
-                        var contactList = $('#contactList');
-                        var contactListItem = $('<div class="contactListItem">' +
-                            '<div><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
-                            + '</div>');
-                        contactList.append(contactListItem);
-                        $('#searchResult').children().children('.notify')
-                            .attr('class','notify notify_success_text')
-                            .text('Contact added');
-                    }
-                })
+                    })
+                } else if(item && item.deactivated){
+                    $('#errorSearch').show().text('User was deleted');
+                }else{
+                    $('#errorSearch').show().text('Your query returned no results.');
+                }
             }
         },function(error){
 

@@ -10,7 +10,8 @@
     ],
     "web_accessible_resources":[
         "share-icon-min.png",
-        "jquery.min.map"
+        "jquery.min.map",
+        "loading.gif"
     ],
     "icons": {
         "16": "share-icon-16.png",

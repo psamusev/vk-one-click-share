@@ -223,3 +223,14 @@ div.shareToChat .post_share_icon{
     color:rgb(37,169,94);
 }
 
+.loading_spinner{
+    display: none;
+    width: 25px;
+    margin: 10px auto;
+}
+
+#errorSearch{
+    display: none;
+    margin-left: 20px;
+}
+
