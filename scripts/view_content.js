@@ -36,7 +36,7 @@ function shareRecord(id_record){
                 }
                 showErrorMessage(response.error);
             } else {
-                showNotificationMessage(notifyTitle,notifyMessage)
+                showNotificationMessage(notifyTitle,notifyMessage);
                 window.setTimeout(function () {
                     $('#vkExtNotificationView').fadeOut(1500);
                 }, 2000);
@@ -130,11 +130,12 @@ function addSettingsRegion(){
     });
 
     $('#showContactListBtn').bind('click',function(){
-        if($('.activeList').is(':visible')){
-            $('.activeList').hide();
+        var list = $('.activeList');
+        if(list.is(':visible')){
+            list.hide();
         } else{
-            $('.activeList').show();
-            filterContactList($('#vk_recipient').val());
+            list.show();
+            filterList($('#vk_recipient').val());
         }
         return false;
 
@@ -172,7 +173,7 @@ function addSettingsRegion(){
     $('#vk_recipient').bind('input',function(){
         $('.activeList > .notFound').hide();
         var chat_id = $(this).val();
-        filterContactList(chat_id);
+        filterList(chat_id);
         chrome.storage.local.set({'vkChatId':chat_id}, function() {
             localStorage.setItem('vk_chat_id',chat_id);
         });
@@ -180,7 +181,7 @@ function addSettingsRegion(){
 
     $('#vk_recipient').bind('focus',function(){
         $('.activeList').show();
-        filterContactList($('#vk_recipient').val());
+        filterList($('#vk_recipient').val());
         console.log('event focus' + $('.activeList').attr('id'));
         return false;
     });
@@ -301,7 +302,7 @@ function addContactDialog(){
     })
 }
 
-function filterContactList(val){
+function filterList(val){
     var list = $(".activeList > .contactListItem");
     if(val === ''){
 
