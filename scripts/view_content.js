@@ -82,8 +82,13 @@ function addSettingsRegion(){
                     '<div><input value="dialog" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Send to dialog</span></div>' +
                     '<div><input value="chat" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Send to chat</span></div>' +
                     '<div><input value="wall" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Post to wall</span></div>' +
+                    '<div id="vkRecipientBlock" style="display: none">' +
+                        '<div class="inl_block">Recipient: </div>' +
+                        '<div id="selectedListItem" class="inl_block btn">' +
+                            '<div class="text inl_bl"></div><span class="remove"></span>' +
+                        '</div>' +
+                    '</div>' +
                     '<div class="inputContainer">' +
-
                         '<div id="showContactListBtn" class="input_arr"></div>' +
                         '<input class="input_text" id="vk_recipient" type="text" name="recipient" placeholder="Enter user name"/>' +
                         '<div id="contactList" class="popupList" style="display: none">' +
@@ -174,9 +179,6 @@ function addSettingsRegion(){
         $('.activeList > .notFound').hide();
         var chat_id = $(this).val();
         filterList(chat_id);
-        chrome.storage.local.set({'vkChatId':chat_id}, function() {
-            localStorage.setItem('vk_chat_id',chat_id);
-        });
     });
 
     $('#vk_recipient').bind('focus',function(){
@@ -184,6 +186,10 @@ function addSettingsRegion(){
         filterList($('#vk_recipient').val());
         console.log('event focus' + $('.activeList').attr('id'));
         return false;
+    });
+
+    $('#vkRecipientBlock').children('#selectedListItem').children('.remove').bind('click',function(){
+        $('#vkRecipientBlock').hide();
     });
 }
 
@@ -260,10 +266,10 @@ function addContactDialog(){
                 if(item && item.deactivated === undefined) {
                     var resultContainer = $('#searchResult');
                     $('<div class="searchResultItem">' +
-                        '<div><img src="' + item.photo_50 + '"/> </div>' +
-                        '<div class="text_item"><strong>' + item.first_name + ' ' + item.last_name + '</strong></div>' +
-                        '<div id="addToContact" class="button_blue" style="top:-30px;margin-left: 10px"><button>Add to contact</button></div>' +
-                        '<div class="notify"></div>' +
+                        '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div>' +
+                        '<div class="text_item inl_block"><strong>' + item.first_name + ' ' + item.last_name + '</strong></div>' +
+                        '<div id="addToContact" class="button_blue inl_block" style="top:-30px;margin-left: 10px"><button>Add to contact</button></div>' +
+                        '<div class="notify inl_block"></div>' +
                         '</div>')
                         .appendTo(resultContainer);
                     $('#addToContact').bind('click', {ID: item.uid}, function (event) {
@@ -275,18 +281,21 @@ function addContactDialog(){
                         });
                         if (res) {
                             $('#searchResult').children().children('.notify')
-                                .attr('class', 'notify notify_error_text')
+                                .addClass('notify_error_text')
                                 .text('This contact already added');
                         } else {
                             window.contactList.push(item);
                             chrome.storage.local.set({'vkContactList': window.contactList});
                             var contactList = $('#contactList');
                             var contactListItem = $('<div class="contactListItem">' +
-                                '<div><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
+                                '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item inl_block">' + item.first_name + ' ' + item.last_name + '</div>'
                                 + '</div>');
+                            contactListItem.bind('click',{uid:item.uid,title:item.first_name + ' ' + item.last_name},function(event){
+                                selectListItem(event.data);
+                            });
                             contactList.append(contactListItem);
                             $('#searchResult').children().children('.notify')
-                                .attr('class', 'notify notify_success_text')
+                                .addClass('notify_success_text')
                                 .text('Contact added');
                         }
                     })
@@ -300,6 +309,15 @@ function addContactDialog(){
 
         })
     })
+}
+
+function selectListItem(data){
+    $('#vkRecipientBlock').children('#selectedListItem').children('.text').text(data.title);
+    $('#vkRecipientBlock').show();
+    chrome.storage.local.set({'vkChatId':data.uid}, function() {
+        localStorage.setItem('vk_chat_id',data.uid);
+    });
+    $('.activeList').hide();
 }
 
 function filterList(val){
@@ -340,8 +358,11 @@ function fillContactList(){
             var contactList = $('#contactList');
             items.forEach(function(item){
                 var contactListItem = $('<div class="contactListItem">' +
-                    '<div><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
+                    '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item inl_block">' + item.first_name + ' ' + item.last_name + '</div>'
                     + '</div>');
+                contactListItem.bind('click',{uid:item.uid,title:item.first_name + ' ' + item.last_name},function(event){
+                    selectListItem(event.data);
+                });
                 contactList.append(contactListItem);
             });
         };
@@ -376,8 +397,11 @@ function fillChatList(){
             var chatList = $('#chatList');
             items.forEach(function(item){
                 var chatListItem = $('<div class="contactListItem">' +
-                    '<div><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.title + '</div>'
+                    '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item inl_block">' + item.title + '</div>'
                     + '</div>');
+                chatListItem.bind('click',{uid:item.chatId,title:item.title},function(event){
+                    selectListItem(event.data);
+                });
                 chatList.append(chatListItem);
             });
         };

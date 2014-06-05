@@ -187,10 +187,6 @@ div.shareToChat .post_share_icon{
     background: rgb(241,245,249);
 }
 
-.contactListItem div{
-    display: inline-block;
-}
-
 .notFound{
     display: none;
 }
@@ -207,10 +203,6 @@ div.shareToChat .post_share_icon{
 
 .searchResultItem{
     padding-left: 20px;
-}
-
-.searchResultItem div{
-    display: inline-block;
 }
 
 .searchResultItem .text_item{
@@ -242,5 +234,34 @@ div.shareToChat .post_share_icon{
 #errorSearch{
     display: none;
     margin-left: 20px;
+}
+
+#selectedListItem{
+    cursor: auto;
+    margin-left: 10px;
+}
+
+#selectedListItem .text{
+    max-width: 120px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.inl_block{
+    display: inline-block;
+}
+
+.remove{
+    cursor: pointer;
+    padding-left: 17px;
+    margin-left: 10px;
+    background: url('chrome-extension://__MSG_@@extension_id__/images/delete.png') no-repeat -0px 1px;
+}
+
+.remove:hover{
+    position: relative;
+    top:1px;
+    background-position: -0px -12px;
 }
 
