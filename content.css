@@ -164,10 +164,10 @@ div.shareToChat .post_share_icon{
     display: inline-block;
 }
 
-#contactList{
+.popupList{
     overflow-y: scroll;
     max-height: 250px;
-    background: white;/*background:rgb(127,127,127);*/
+    background: white;
     color: black;
     z-index: 200;
     width: 232px;
@@ -180,6 +180,7 @@ div.shareToChat .post_share_icon{
     padding: 5px;
     border-bottom: 1px solid #C0CAD5;
     cursor: pointer;
+    height: 65px;
 }
 
 .contactListItem:hover{
@@ -198,6 +199,10 @@ div.shareToChat .post_share_icon{
     position: relative;
     top: -20px;
     margin-left: 10px;
+    width: 145px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .searchResultItem{

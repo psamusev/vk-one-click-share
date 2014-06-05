@@ -86,15 +86,18 @@ function addSettingsRegion(){
 
                         '<div id="showContactListBtn" class="input_arr"></div>' +
                         '<input class="input_text" id="vk_recipient" type="text" name="recipient" placeholder="Enter user name"/>' +
-                        '<div id="contactList" style="display: none">' +
+                        '<div id="contactList" class="popupList" style="display: none">' +
                             '<div class="contactListItem notFound">Not found contact</div>' +
+                        '</div>' +
+                        '<div id="chatList" class="popupList" style="display: none">' +
+                            '<div class="contactListItem notFound">Not found chat</div>' +
                         '</div>' +
                     '</div>' +
                     '<div class="btn" id="addNewContactBtn">Add new contact</div>' +
                 '</div>' +
             '</div>' +
             '<div class="vkExtIconSettings">' +
-            '<image src="' + chrome.extension.getURL("share-icon-min.png") +'"/'  +
+            '<image src="' + chrome.extension.getURL("images/share-icon-min.png") +'"/'  +
             '</div>'
     ).appendTo(body);
 
@@ -127,12 +130,13 @@ function addSettingsRegion(){
     });
 
     $('#showContactListBtn').bind('click',function(){
-        if($('#contactList').is(':visible')){
-            $('#contactList').hide();
+        if($('.activeList').is(':visible')){
+            $('.activeList').hide();
         } else{
-            $('#contactList').show();
+            $('.activeList').show();
             filterContactList($('#vk_recipient').val());
         }
+        return false;
 
     });
 
@@ -145,11 +149,16 @@ function addSettingsRegion(){
     });
 
     $('input:radio[name=sendFlag]').click(function(){
+        $('.activeList').hide();
         var chat_flag = $(this).val();
         if(chat_flag === "chat"){
+            $('#contactList').removeClass('activeList');
+            $('#chatList').addClass('activeList');
             $('.inputContainer').show();
             $('#vk_recipient').attr('placeholder','Enter chat name');
         } else if(chat_flag === 'dialog'){
+            $('#chatList').removeClass('activeList');
+            $('#contactList').addClass('activeList');
             $('.inputContainer').show();
             $('#vk_recipient').attr('placeholder','Enter user name');
         } else{
@@ -161,7 +170,7 @@ function addSettingsRegion(){
     });
 
     $('#vk_recipient').bind('input',function(){
-        $('#contactList > .notFound').hide();
+        $('.activeList > .notFound').hide();
         var chat_id = $(this).val();
         filterContactList(chat_id);
         chrome.storage.local.set({'vkChatId':chat_id}, function() {
@@ -170,7 +179,10 @@ function addSettingsRegion(){
     });
 
     $('#vk_recipient').bind('focus',function(){
-        $('#contactList').show();
+        $('.activeList').show();
+        filterContactList($('#vk_recipient').val());
+        console.log('event focus' + $('.activeList').attr('id'));
+        return false;
     });
 }
 
@@ -198,7 +210,7 @@ function addContactDialog(){
             '</div>' +
             '<div id="searchResult"></div>' +
             '<div id="errorSearch"></div>' +
-            '<div class="loading_spinner"><img src="' + chrome.extension.getURL("loading.gif")+ '" /> </div>' +
+            '<div class="loading_spinner"><img src="' + chrome.extension.getURL("images/loading.gif")+ '" /> </div>' +
             '</div>')
         .appendTo($('#box_layer_wrap'));
 
@@ -290,25 +302,32 @@ function addContactDialog(){
 }
 
 function filterContactList(val){
+    var list = $(".activeList > .contactListItem");
     if(val === ''){
-        $('#contactList > .contactListItem').each(function(){
+
+        list.each(function(){
             if($(this).attr('class').indexOf('notFound') < 0){
                 $(this).show();
+            } else {
+                $(this).hide();
             }
         });
     } else {
         var countHide = 0;
-        $('#contactList > .contactListItem').each(function () {
-            var text = $(this).children('.text_item').text().toLowerCase();
-            if (text.indexOf(val) >= 0) {
-                $(this).show()
-            } else {
-                $(this).hide();
-                countHide++;
+        list.each(function () {
+            var item = $(this).children('.text_item');
+            if(item[0] != undefined){
+                var text = item.text().toLowerCase();
+                if (text.indexOf(val) >= 0) {
+                    $(this).show()
+                } else {
+                    $(this).hide();
+                    countHide++;
+                }
             }
         });
-        if (countHide - 1 === window.contactList.length) {
-            $('#contactList > .notFound').show();
+        if (countHide === list.length- 1) {
+            $('.activeList > .notFound').show();
         }
     }
 }
@@ -344,6 +363,49 @@ function fillContactList(){
             })
         } else {
             fill(result.vkContactList);
+        }
+
+    });
+}
+
+function fillChatList(){
+    chrome.storage.local.get('vkChatList',function(result){
+
+        function fill(items){
+            var chatList = $('#chatList');
+            items.forEach(function(item){
+                var chatListItem = $('<div class="contactListItem">' +
+                    '<div><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.title + '</div>'
+                    + '</div>');
+                chatList.append(chatListItem);
+            });
+        };
+
+        window.chatList = result.vkChatList || [];
+        if(result.vkChatList === undefined){
+            vkRequest.getAllChats({
+                count:200
+            },function(response){
+                if(response.error){
+                    alert(response.error.error_msg);
+                } else{
+                    response.response.forEach(function(item){
+                        if(item.chat_id){
+                            window.chatList.push({
+                                photo_50:item.photo_50 || 'http://vk.com/images/camera_50.gif',
+                                title:item.title,
+                                chatId:item.chat_id
+                            })
+                        }
+                    });
+                    chrome.storage.local.set({'vkChatList': window.chatList});
+                    fill(window.chatList);
+                }
+            },function(error){
+
+            })
+        } else {
+            fill(window.chatList);
         }
 
     });
@@ -394,6 +456,7 @@ function start(){
     addNotificationView();
     addContactDialog();
     fillContactList();
+    fillChatList();
 
     chrome.storage.local.get('vkAccessData', function(items) {
         localStorage.setItem('auth_token',items.vkAccessData.token);
@@ -409,6 +472,10 @@ function start(){
     chrome.storage.local.get('vkSendFlag',function(result){
         var flag = (result.vkSendFlag !== undefined) ? result.vkSendFlag : 'wall';
         $('input:radio[name=sendFlag][value=' + flag + ']').attr('checked', 'checked');
+        switch (flag){
+            case 'dialog': $('#contactList').addClass('activeList'); break;
+            case 'chat': $('#chatList').addClass('activeList'); break;
+        }
         localStorage.setItem('vk_send_flag',flag);
     });
 

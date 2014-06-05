@@ -9,23 +9,23 @@
         "tabs", "storage","http://*/*", "https://*/*"
     ],
     "web_accessible_resources":[
-        "share-icon-min.png",
+        "images/share-icon-min.png",
         "jquery.min.map",
-        "loading.gif"
+        "images/loading.gif"
     ],
     "icons": {
-        "16": "share-icon-16.png",
-        "48": "share-icon-48.png",
-        "128": "share-icon-128.png"
+        "16": "images/share-icon-16.png",
+        "48": "images/share-icon-48.png",
+        "128": "images/share-icon-128.png"
     },
     "background":{
-        "scripts":["request_ExtSide.js","background.js"],
+        "scripts":["scripts/request_ExtSide.js","scripts/background.js"],
         "persistent": false
     },
     "content_scripts": [
         {
             "matches": [ "http://vk.com/*" ,"https://vk.com/*"],
-            "js": ["jquery.min.js","requests.js","view_content.js"],
+            "js": ["jquery.min.js","scripts/requests.js","scripts/view_content.js"],
             "css" : ["content.css"]
         }
     ]

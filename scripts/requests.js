@@ -13,6 +13,15 @@ vkRequest.getChat = function(data,successCallback,errorCallback){
     request(url,successCallback,errorCallback);
 };
 
+vkRequest.getAllChats = function(data,successCallback,errorCallback){
+    var server = 'https://api.vk.com/method/',
+        method = 'messages.getDialogs?',
+        count = 'count=' + data.count,
+        access_token = '&access_token=' + localStorage.getItem('auth_token');
+    var url = server + method + count +  access_token;
+    request(url,successCallback,errorCallback);
+}
+
 vkRequest.findUser = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
         method = 'users.get?',
