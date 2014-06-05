@@ -191,7 +191,9 @@ function addSettingsRegion(){
     });
 
     $('#vkRecipientBlock').children('#selectedListItem').children('.remove').bind('click',function(){
+        localStorage.setItem('vk_chat_id','');
         $('#vkRecipientBlock').hide();
+        chrome.storage.local.remove('vkChatData');
     });
 }
 
@@ -316,7 +318,7 @@ function addContactDialog(){
 function selectListItem(data){
     showRecipientTitle(data.title);
     chrome.storage.local.set({'vkChatData': data}, function() {
-        localStorage.setItem('vk_chat_id',data.uid);
+        localStorage.setItem('vk_chat_id',data.id);
     });
     $('.activeList').hide();
 }
