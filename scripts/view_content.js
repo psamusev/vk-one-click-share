@@ -82,10 +82,12 @@ function addSettingsRegion(){
                     '<div><input value="dialog" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Send to dialog</span></div>' +
                     '<div><input value="chat" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Send to chat</span></div>' +
                     '<div><input value="wall" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Post to wall</span></div>' +
-                    '<div id="vkRecipientBlock" style="display: none">' +
-                        '<div class="inl_block">Recipient: </div>' +
-                        '<div id="selectedListItem" class="inl_block btn">' +
-                            '<div class="text inl_bl"></div><span class="remove"></span>' +
+                    '<div style="height: 33px">' +
+                        '<div id="vkRecipientBlock" style="display: none">' +
+                            '<div class="inl_block">Recipient: </div>' +
+                            '<div id="selectedListItem" class="inl_block btn">' +
+                                '<div class="text inl_bl"></div><span class="remove"></span>' +
+                            '</div>' +
                         '</div>' +
                     '</div>' +
                     '<div class="inputContainer">' +
@@ -312,12 +314,16 @@ function addContactDialog(){
 }
 
 function selectListItem(data){
-    $('#vkRecipientBlock').children('#selectedListItem').children('.text').text(data.title);
-    $('#vkRecipientBlock').show();
-    chrome.storage.local.set({'vkChatId':data.uid}, function() {
+    showRecipientTitle(data.title);
+    chrome.storage.local.set({'vkChatData': data}, function() {
         localStorage.setItem('vk_chat_id',data.uid);
     });
     $('.activeList').hide();
+}
+
+function showRecipientTitle(title){
+    $('#vkRecipientBlock').children('#selectedListItem').children('.text').text(title);
+    $('#vkRecipientBlock').show();
 }
 
 function filterList(val){
@@ -487,10 +493,10 @@ function start(){
         localStorage.setItem('auth_token',items.vkAccessData.token);
     });
 
-    chrome.storage.local.get('vkChatId',function(result){
-        localStorage.setItem('vk_chat_id',result.vkChatId);
-        if(result.vkChatId !== undefined) {
-//            $('#vk_chat_id').val(result.vkChatId);
+    chrome.storage.local.get('vkChatData',function(result){
+        if(result.vkChatData) {
+            localStorage.setItem('vk_chat_id', result.vkChatData.id);
+            showRecipientTitle(result.vkChatData.title)
         }
     });
 
