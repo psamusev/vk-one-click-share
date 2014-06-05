@@ -292,7 +292,7 @@ function addContactDialog(){
                             var contactListItem = $('<div class="contactListItem">' +
                                 '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item inl_block">' + item.first_name + ' ' + item.last_name + '</div>'
                                 + '</div>');
-                            contactListItem.bind('click',{uid:item.uid,title:item.first_name + ' ' + item.last_name},function(event){
+                            contactListItem.bind('click',{id:item.uid,title:item.first_name + ' ' + item.last_name},function(event){
                                 selectListItem(event.data);
                             });
                             contactList.append(contactListItem);
@@ -366,7 +366,7 @@ function fillContactList(){
                 var contactListItem = $('<div class="contactListItem">' +
                     '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item inl_block">' + item.first_name + ' ' + item.last_name + '</div>'
                     + '</div>');
-                contactListItem.bind('click',{uid:item.uid,title:item.first_name + ' ' + item.last_name},function(event){
+                contactListItem.bind('click',{id:item.uid,title:item.first_name + ' ' + item.last_name},function(event){
                     selectListItem(event.data);
                 });
                 contactList.append(contactListItem);
@@ -405,7 +405,7 @@ function fillChatList(){
                 var chatListItem = $('<div class="contactListItem">' +
                     '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item inl_block">' + item.title + '</div>'
                     + '</div>');
-                chatListItem.bind('click',{uid:item.chatId,title:item.title},function(event){
+                chatListItem.bind('click',{id:item.chatId,title:item.title},function(event){
                     selectListItem(event.data);
                 });
                 chatList.append(chatListItem);
