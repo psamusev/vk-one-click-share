@@ -20,8 +20,6 @@ function addShareToChatButton(){
 }
 
 function shareRecord(id_record){
-    var id = Number(localStorage.getItem('vk_chat_id'));
-    var vk_chat_flag = (localStorage.getItem('vk_send_flag') === 'chat');
     var sendToWall = (localStorage.getItem('vk_send_flag') === 'wall');
 
     if(sendToWall) {
@@ -45,13 +43,13 @@ function shareRecord(id_record){
             alert(error.error_msg);
         });
     } else {
-
+        var data = window.vkExtselectionData;
         var notifyTitle = 'Message sent';
         var notifyMessage = 'Your message has been sent';
         vkRequest.sendRecord({
-            chat_id: id,
+            chat_id: data.id,
             recordId: id_record,
-            chat_flag: vk_chat_flag
+            chat_flag: data.chat
         }, function (response, one) {
             if (response.error) {
                 if(response.error.error_code === 1){
@@ -294,7 +292,7 @@ function addContactDialog(){
                             var contactListItem = $('<div class="contactListItem">' +
                                 '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item inl_block">' + item.first_name + ' ' + item.last_name + '</div>'
                                 + '</div>');
-                            contactListItem.bind('click',{id:item.uid,title:item.first_name + ' ' + item.last_name},function(event){
+                            contactListItem.bind('click',{id:item.uid,title:item.first_name + ' ' + item.last_name,chat:false},function(event){
                                 selectListItem(event.data);
                             });
                             contactList.append(contactListItem);
@@ -320,6 +318,7 @@ function selectListItem(data){
     chrome.storage.local.set({'vkChatData': data}, function() {
         localStorage.setItem('vk_chat_id',data.id);
     });
+    window.vkExtselectionData = data;
     $('.activeList').hide();
 }
 
@@ -368,7 +367,7 @@ function fillContactList(){
                 var contactListItem = $('<div class="contactListItem">' +
                     '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item inl_block">' + item.first_name + ' ' + item.last_name + '</div>'
                     + '</div>');
-                contactListItem.bind('click',{id:item.uid,title:item.first_name + ' ' + item.last_name},function(event){
+                contactListItem.bind('click',{id:item.uid,title:item.first_name + ' ' + item.last_name,chat:false},function(event){
                     selectListItem(event.data);
                 });
                 contactList.append(contactListItem);
@@ -407,7 +406,7 @@ function fillChatList(){
                 var chatListItem = $('<div class="contactListItem">' +
                     '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item inl_block">' + item.title + '</div>'
                     + '</div>');
-                chatListItem.bind('click',{id:item.chatId,title:item.title},function(event){
+                chatListItem.bind('click',{id:item.chatId,title:item.title,chat:true},function(event){
                     selectListItem(event.data);
                 });
                 chatList.append(chatListItem);
@@ -498,7 +497,8 @@ function start(){
     chrome.storage.local.get('vkChatData',function(result){
         if(result.vkChatData) {
             localStorage.setItem('vk_chat_id', result.vkChatData.id);
-            showRecipientTitle(result.vkChatData.title)
+            showRecipientTitle(result.vkChatData.title);
+            window.vkExtselectionData = result.vkChatData;
         }
     });
 
