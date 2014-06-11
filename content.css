@@ -274,12 +274,18 @@ div.shareToChat .post_share_icon{
     margin-right: -1px;
 }
 
+.mCS_no_scrollbar_y{
+    margin-right: 0 !important;
+}
+
 .mCSB_draggerContainer .mCSB_dragger .mCSB_dragger_bar{
     width: 9px !important;
     border-radius: 5px !important;
+    margin-right: 1px;
 }
 .mCSB_draggerContainer .mCSB_draggerRail{
     width: 9px !important;
+    margin-right: 1px;
 }
 
 div.text_item{

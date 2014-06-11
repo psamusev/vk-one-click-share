@@ -146,7 +146,7 @@ function addSettingsRegion(){
 
     });
 
-    body.bind('click',function(){
+    body.bind('mousedown',function(){
         if(!$(event.target).parents('.vkExtSettings')[0]
             && $(event.target).attr("class") !== 'vkExtSettings'){
                 iconSetting.show();
