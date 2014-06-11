@@ -151,6 +151,7 @@ function addSettingsRegion(){
             && $(event.target).attr("class") !== 'vkExtSettings'){
                 iconSetting.show();
                 settings.hide();
+                $('.activeList').hide();
         }
     });
 
@@ -174,6 +175,19 @@ function addSettingsRegion(){
             localStorage.setItem('vk_send_flag',chat_flag);
         });
     });
+
+
+    $("#contactList").mCustomScrollbar({
+        theme:"dark-2",
+        scrollInertia:100
+    });
+
+    $("#chatList").mCustomScrollbar({
+        theme:"dark-2",
+        scrollInertia:100
+    });
+
+    $('.mCSB_container').css('margin-right','15px');
 
     $('#vk_recipient').bind('input',function(){
         $('.activeList > .notFound').hide();
@@ -328,7 +342,7 @@ function showRecipientTitle(title){
 }
 
 function filterList(val){
-    var list = $(".activeList > .contactListItem");
+    var list = $(".activeList > .mCustomScrollBox > .mCSB_container > .contactListItem");
     if(val === ''){
 
         list.each(function(){
@@ -362,7 +376,7 @@ function fillContactList(){
     chrome.storage.local.get('vkContactList',function(result){
 
         function fill(items){
-            var contactList = $('#contactList');
+            var contactList = $('#contactList > .mCustomScrollBox > .mCSB_container');
             items.forEach(function(item){
                 var contactListItem = $('<div class="contactListItem">' +
                     '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item inl_block">' + item.first_name + ' ' + item.last_name + '</div>'
@@ -401,7 +415,7 @@ function fillChatList(){
     chrome.storage.local.get('vkChatList',function(result){
 
         function fill(items){
-            var chatList = $('#chatList');
+            var chatList = $('#chatList > .mCustomScrollBox > .mCSB_container');
             items.forEach(function(item){
                 var chatListItem = $('<div class="contactListItem">' +
                     '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item inl_block">' + item.title + '</div>'
@@ -515,8 +529,11 @@ function start(){
 
 }
 
-var interval = window.setInterval(function(){
-    addShareToChatButton();
-},1000);
+$(document).ready(function () {
+    var interval = window.setInterval(function(){
+        addShareToChatButton();
+    },1000);
 
-start();
+    start();
+});
+

@@ -26,8 +26,8 @@
     "content_scripts": [
         {
             "matches": [ "http://vk.com/*" ,"https://vk.com/*"],
-            "js": ["jquery.min.js","scripts/requests.js","scripts/view_content.js"],
-            "css" : ["content.css"]
+            "js": ["jquery.min.js","jquery.mousewheel.min.js","jquery.mCustomScrollbar.concat.min.js","scripts/requests.js","scripts/view_content.js"],
+            "css" : ["jquery.mCustomScrollbar.css","content.css"]
         }
     ]
 }
