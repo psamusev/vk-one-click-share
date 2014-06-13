@@ -197,9 +197,8 @@ div.shareToChat .post_share_icon{
 
 .contactListItem .text_item{
     position: relative;
-    top: -20px;
+    top: -35px;
     margin-left: 70px;
-    margin-top: -10px;
     width: 140px !important;
     overflow: hidden;
     text-overflow: ellipsis;
