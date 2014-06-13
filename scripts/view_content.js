@@ -193,7 +193,7 @@ function addSettingsRegion(){
         }
     });
 
-    $('.mCSB_container').css('margin-right','15px');
+    $('.mCSB_container').css('margin-right','10px');
 
     $('#vk_recipient').bind('input',function(){
         $('.activeList > .notFound').hide();
@@ -204,7 +204,6 @@ function addSettingsRegion(){
     $('#vk_recipient').bind('focus',function(){
         $('.activeList').show();
         filterList($('#vk_recipient').val());
-        console.log('event focus' + $('.activeList').attr('id'));
         return false;
     });
 
@@ -310,7 +309,7 @@ function addContactDialog(){
                             chrome.storage.local.set({'vkContactList': window.contactList});
                             var contactList = $('#contactList');
                             var contactListItem = $('<div class="contactListItem">' +
-                                '<div class="inl_block"><img src="' + item.photo_50 + '" style="height:50px;"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
+                                '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
                                 + '</div>');
                             contactListItem.bind('click',{id:item.uid,title:item.first_name + ' ' + item.last_name,chat:false},function(event){
                                 selectListItem(event.data);
@@ -373,7 +372,7 @@ function filterList(val){
             }
         });
         if (countHide === list.length- 1) {
-            $('.activeList > .notFound').show();
+            $('.activeList > .mCustomScrollBox > .mCSB_container > .notFound').show();
         }
     }
 }
@@ -385,7 +384,7 @@ function fillContactList(){
             var contactList = $('#contactList > .mCustomScrollBox > .mCSB_container');
             items.forEach(function(item){
                 var contactListItem = $('<div class="contactListItem">' +
-                    '<div class="inl_block"><img src="' + item.photo_50 + '" style="height:50px;" /> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
+                    '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
                     + '</div>');
                 contactListItem.bind('click',{id:item.uid,title:item.first_name + ' ' + item.last_name,chat:false},function(event){
                     selectListItem(event.data);
@@ -424,7 +423,7 @@ function fillChatList(){
             var chatList = $('#chatList > .mCustomScrollBox > .mCSB_container');
             items.forEach(function(item){
                 var chatListItem = $('<div class="contactListItem">' +
-                    '<div class="inl_block"><img src="' + item.photo_50 + '"  style="height:50px;" /> </div><div class="text_item">' + item.title + '</div>'
+                    '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.title + '</div>'
                     + '</div>');
                 chatListItem.bind('click',{id:item.chatId,title:item.title,chat:true},function(event){
                     selectListItem(event.data);

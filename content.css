@@ -181,9 +181,8 @@ div.shareToChat .post_share_icon{
 
 .contactListItem{
     padding: 5px;
-    border-bottom: 1px solid #C0CAD5;
     cursor: pointer;
-    height: 65px;
+    height: 55px;
 }
 
 .contactListItem:hover{
@@ -192,6 +191,8 @@ div.shareToChat .post_share_icon{
 
 .notFound{
     display: none;
+    text-align: center;
+    line-height: 5;
 }
 
 .contactListItem .text_item{
@@ -207,7 +208,12 @@ div.shareToChat .post_share_icon{
 }
 
 .contactListItem .inl_block{
-    margin-top: 7px;
+    margin-top: 2px;
+}
+
+.contactListItem .inl_block img{
+    border-radius: 5px;
+    height: 50px;
 }
 
 .searchResultItem{
