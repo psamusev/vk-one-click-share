@@ -206,6 +206,10 @@ div.shareToChat .post_share_icon{
     display: block !important;
 }
 
+.contactListItem .inl_block{
+    margin-top: 7px;
+}
+
 .searchResultItem{
     padding-left: 20px;
 }
