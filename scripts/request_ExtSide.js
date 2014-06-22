@@ -57,7 +57,7 @@ vkRequest.auth = function(callback){
 
 
 
-                    chrome.storage.local.set({'vkAccessDataNew': vkRequest.OAuthURL});
+                    chrome.storage.local.set({'vkAccessData': vkRequest.OAuthURL});
                     if(callback !== undefined) {
                         callback.successCallback(vkAccessToken);
                     }

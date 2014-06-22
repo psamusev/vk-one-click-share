@@ -583,7 +583,7 @@ function start(){
     });
 
     $('#logout_link').click(function(){
-        chrome.storage.local.remove('vkAccessDataNew');
+        chrome.storage.local.remove('vkAccessData');
         chrome.storage.local.remove('vkSendFlag');
         chrome.storage.local.remove('vkChatData');
         chrome.storage.local.remove('vkChatList');
@@ -606,10 +606,10 @@ $(document).ready(function () {
     var showExtInterval = window.setInterval(function(){
         if(!isLoginPage()){
             clearInterval(showExtInterval);
-            chrome.storage.local.get('vkAccessDataNew', function (items) {
+            chrome.storage.local.get('vkAccessData', function (items) {
 
-                if (items.vkAccessDataNew !== undefined) {
-                    localStorage.setItem('auth_token', items.vkAccessDataNew.token);
+                if (items.vkAccessData !== undefined) {
+                    localStorage.setItem('auth_token', items.vkAccessData.token);
                     window.setInterval(function () {
                         addShareToChatButton();
                     }, 1000);
