@@ -21,10 +21,10 @@ function addShareToChatButton(){
 
 function shareRecord(id_record){
     var sendToWall = (localStorage.getItem('vk_send_flag') === 'wall');
-
+    var notifyTitle,notifyMessage;
     if(sendToWall) {
-        var notifyTitle = 'Record posted';
-        var notifyMessage = 'Record has posted to your wall';
+        notifyTitle = 'Record posted';
+        notifyMessage = 'Record has posted to your wall';
         vkRequest.postRecord({
             recordId: id_record
         }, function (response) {
@@ -44,13 +44,13 @@ function shareRecord(id_record){
         });
     } else {
         var data = window.vkExtselectionData;
-        var notifyTitle = 'Message sent';
-        var notifyMessage = 'Your message has been sent';
+        notifyTitle = 'Message sent';
+        notifyMessage = 'Your message has been sent';
         vkRequest.sendRecord({
             chat_id: data.id,
             recordId: id_record,
             chat_flag: data.chat
-        }, function (response, one) {
+        }, function (response) {
             if (response.error) {
                 if(response.error.error_code === 1){
                     response.error.error_msg = "Message didn't send: This record can't be send. Please check 'sending option'"
@@ -73,7 +73,7 @@ function addSettingsRegion(){
 
     var body = $('body');
     $("<div></div>",{id:'outerVkExtSettings'})
-        .html('<div class="vkExtSettings">' +
+        .html('<div id="vkExtSettings" class="vkExtPanel">' +
                 '<div class="itemSettings">' +
                     //'<input id="vk_chat_id" type="number" name="chat_id" min="0" value="0"/>' +
                     '<div style="margin-top: 10px">Select "sending option":</div>' +
@@ -101,12 +101,15 @@ function addSettingsRegion(){
                     '<div class="btn" id="addNewContactBtn">Add new contact</div>' +
                 '</div>' +
             '</div>' +
+            '<div id="vkExtEnablePanel" class="vkExtPanel" style="float:right">' +
+                '<div class="btn" id="enableExtButton">Launch</div>' +
+            '</div>'+
             '<div class="vkExtIconSettings">' +
             '<image src="' + chrome.extension.getURL("images/share-icon-min.png") +'"/'  +
             '</div>'
     ).appendTo(body);
 
-    var settings = $('.vkExtSettings');
+    var settings = $('#vkExtSettings');
     var iconSetting = $('.vkExtIconSettings');
 
     iconSetting.bind('mouseenter',function(){
@@ -125,7 +128,12 @@ function addSettingsRegion(){
 
     iconSetting.bind('click',function(){
         $(this).hide();
-        settings.show();
+        if(localStorage.getItem('auth_token')){
+            settings.show();
+        } else{
+            $('#vkExtEnablePanel').show();
+        }
+
         event.stopPropagation();
 
     });
@@ -146,12 +154,24 @@ function addSettingsRegion(){
 
     });
 
-    body.bind('mousedown',function(){
-        if(!$(event.target).parents('.vkExtSettings')[0]
-            && $(event.target).attr("class") !== 'vkExtSettings'){
+    $('#enableExtButton').click(function(){
+        var showIconInterval = window.setInterval(function(){
+            if(window.chatList && window.contactList){
+                clearInterval(showIconInterval);
                 iconSetting.show();
-                settings.hide();
-                $('.activeList').hide();
+            }
+        },100);
+
+        $('#vkExtEnablePanel').hide();
+        authorization();
+    });
+
+    body.bind('mousedown',function(){
+        if(!$(event.target).parents('.vkExtPanel')[0]
+            && $(event.target).attr("class") !== 'vkExtPanel'){
+            iconSetting.show();
+            $('.vkExtPanel').hide();
+            $('.activeList').hide();
         }
     });
 
@@ -332,6 +352,10 @@ function addContactDialog(){
     })
 }
 
+function isLoginPage(){
+    return (document.getElementById('logout_link') === null);
+}
+
 function selectListItem(data){
     showRecipientTitle(data.title);
     chrome.storage.local.set({'vkChatData': data}, function() {
@@ -342,12 +366,13 @@ function selectListItem(data){
 }
 
 function showRecipientTitle(title){
-    $('#vkRecipientBlock').children('#selectedListItem').children('.text').text(title);
-    $('#vkRecipientBlock').show();
+    var recBlock = $('#vkRecipientBlock');
+    recBlock.children('#selectedListItem').children('.text').text(title);
+    recBlock.show();
 }
 
 function filterList(val){
-    var list = $(".activeList > .mCustomScrollBox > .mCSB_container > .contactListItem");
+    var list = $('.activeList > .mCustomScrollBox > .mCSB_container > .contactListItem');
     if(val === ''){
 
         list.each(function(){
@@ -373,6 +398,8 @@ function filterList(val){
         });
         if (countHide === list.length- 1) {
             $('.activeList > .mCustomScrollBox > .mCSB_container > .notFound').show();
+        } else{
+            $('.activeList > .mCustomScrollBox > .mCSB_container > .notFound').hide();
         }
     }
 }
@@ -381,7 +408,7 @@ function fillContactList(){
     chrome.storage.local.get('vkContactList',function(result){
 
         function fill(items){
-            var contactList = $('#contactList > .mCustomScrollBox > .mCSB_container');
+            var contactList = $('#contactList').find('> .mCustomScrollBox > .mCSB_container');
             items.forEach(function(item){
                 var contactListItem = $('<div class="contactListItem">' +
                     '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
@@ -391,9 +418,9 @@ function fillContactList(){
                 });
                 contactList.append(contactListItem);
             });
-        };
+        }
 
-        window.contactList = result.vkContactList;
+        //window.contactList = result.vkContactList;
         if(result.vkContactList === undefined){
             vkRequest.getFriends({
                 order:'hints',
@@ -402,15 +429,16 @@ function fillContactList(){
                 if(response.error){
                     alert(response.error.error_msg);
                 } else{
-                    window.contactList = response.response;
                     chrome.storage.local.set({'vkContactList': response.response});
                     fill(response.response);
+                    window.contactList = response.response;
                 }
             },function(error){
 
             })
         } else {
             fill(result.vkContactList);
+            window.contactList = result.vkContactList;
         }
 
     });
@@ -420,7 +448,7 @@ function fillChatList(){
     chrome.storage.local.get('vkChatList',function(result){
 
         function fill(items){
-            var chatList = $('#chatList > .mCustomScrollBox > .mCSB_container');
+            var chatList = $('#chatList').find('> .mCustomScrollBox > .mCSB_container');
             items.forEach(function(item){
                 var chatListItem = $('<div class="contactListItem">' +
                     '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.title + '</div>'
@@ -430,9 +458,8 @@ function fillChatList(){
                 });
                 chatList.append(chatListItem);
             });
-        };
+        }
 
-        window.chatList = result.vkChatList || [];
         if(result.vkChatList === undefined){
             vkRequest.getAllChats({
                 count:200
@@ -440,23 +467,26 @@ function fillChatList(){
                 if(response.error){
                     alert(response.error.error_msg);
                 } else{
+                    var arrayChat = [];
                     response.response.forEach(function(item){
                         if(item.chat_id){
-                            window.chatList.push({
+                            arrayChat.push({
                                 photo_50:item.photo_50 || 'http://vk.com/images/camera_50.gif',
                                 title:item.title,
                                 chatId:item.chat_id
                             })
                         }
                     });
-                    chrome.storage.local.set({'vkChatList': window.chatList});
-                    fill(window.chatList);
+                    chrome.storage.local.set({'vkChatList': arrayChat});
+                    fill(arrayChat);
+                    window.chatList = arrayChat;
                 }
             },function(error){
 
             })
         } else {
-            fill(window.chatList);
+            fill(result.vkChatList);
+            window.chatList = result.vkChatList;
         }
 
     });
@@ -496,22 +526,42 @@ function showErrorMessage(error){
 }
 
 function showNotificationMessage(title, message){
-    $('#vkExtNotificationView').children('.notification_title').text(title);
-    $('#vkExtNotificationView').children('.notification_body').text(message);
-    $('#vkExtNotificationView').show();
+    var view = $('#vkExtNotificationView');
+    view.children('.notification_title').text(title);
+    view.children('.notification_body').text(message);
+    view.show();
+}
+
+function authorization(){
+/*    var vkObjectScript = document.scripts[0].textContent;
+    var startI = vkObjectScript.indexOf('{');
+    var endI = vkObjectScript.indexOf('}');
+    var id = Number(vkObjectScript.substring(startI,endI + 1).match(/id: \d+/)[0].replace('id: ',''));*/
+    var port = chrome.runtime.connect({name:'accessConnection'});
+    port.postMessage({msg:'getActiveTabId'});
+    port.onMessage.addListener(function(response) {
+        if(response.event === 'getAccess') {
+            if (response.msg.toLowerCase() === 'ok') {
+                localStorage.setItem('auth_token', response.token);
+                window.setInterval(function () {
+                    addShareToChatButton();
+                }, 1000);
+
+                start();
+            }
+            port.disconnect();
+        } else if(response.event === 'getActiveTabId'){
+            port.postMessage({msg:'getAccess',tabId: response.tabId});
+        }
+    });
+
 }
 
 function start(){
     addShareToChatButton();
-    addSettingsRegion();
-    addNotificationView();
     addContactDialog();
     fillContactList();
     fillChatList();
-
-    chrome.storage.local.get('vkAccessData', function(items) {
-        localStorage.setItem('auth_token',items.vkAccessData.token);
-    });
 
     chrome.storage.local.get('vkChatData',function(result){
         if(result.vkChatData) {
@@ -527,18 +577,50 @@ function start(){
         switch (flag){
             case 'dialog': $('#contactList').addClass('activeList'); break;
             case 'chat': $('#chatList').addClass('activeList'); break;
+            case 'wall': $('.inputContainer').hide();
         }
         localStorage.setItem('vk_send_flag',flag);
     });
 
+    $('#logout_link').click(function(){
+        chrome.storage.local.remove('vkAccessDataNew');
+        chrome.storage.local.remove('vkSendFlag');
+        chrome.storage.local.remove('vkChatData');
+        chrome.storage.local.remove('vkChatList');
+        chrome.storage.local.remove('vkContactList');
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('vk_chat_id');
+        localStorage.removeItem('vk_send_flag');
+    })
+}
 
+function addViewExt(){
+    addSettingsRegion();
+    addNotificationView();
+    window.chatList = undefined;
+    window.contactList = undefined;
 }
 
 $(document).ready(function () {
-    var interval = window.setInterval(function(){
-        addShareToChatButton();
-    },1000);
 
-    start();
+    var showExtInterval = window.setInterval(function(){
+        if(!isLoginPage()){
+            clearInterval(showExtInterval);
+            chrome.storage.local.get('vkAccessDataNew', function (items) {
+
+                if (items.vkAccessDataNew !== undefined) {
+                    localStorage.setItem('auth_token', items.vkAccessDataNew.token);
+                    window.setInterval(function () {
+                        addShareToChatButton();
+                    }, 1000);
+                    start();
+                }
+                addViewExt();
+            })
+
+        }
+
+    },5000);
+
 });
 

@@ -61,6 +61,26 @@ vkRequest.postRecord = function(data,successCallback,errorCallback){
     request(url,successCallback,errorCallback);
 };
 
+vkRequest.storageSet = function(data,successCallback,errorCallback){
+    var server = 'https://api.vk.com/method/',
+        method = 'storage.set?',
+        key = 'key=' + data.key,
+        value = '&value=' + data.value,
+        user_id = '&user_id=' + data.userId;
+    var url = server + method + key + value + user_id;
+    request(url,successCallback,errorCallback);
+};
+
+vkRequest.storageGet = function(data,successCallback,errorCallback){
+    var server = 'https://api.vk.com/method/',
+        method = 'storage.get?',
+        key = 'key=' + data.key,
+        user_id = '&user_id=' + data.userId,
+        global = '&global=1';
+    var url = server + method + key + global;
+    request(url,successCallback,errorCallback);
+};
+
 function request(url,successCallback,errorCallback){
     $.ajax({
         url:url,

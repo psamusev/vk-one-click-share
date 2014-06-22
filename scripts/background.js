@@ -3,28 +3,44 @@
  */
 
 
-chrome.storage.local.get('vkAccessData', function(items) {
-    if (items.vkAccessData === undefined) {
+/*chrome.storage.local.get('vkAccessDataNew', function(items) {
+    if (items.vkAccessDataNew === undefined) {
         vkRequest.auth();
     }
-});
+});*/
 
-function listenerHandler(vkTabId){
-    return function tabUpdateListener(tabId, changeInfo,tab) {
+chrome.runtime.onConnect.addListener(function(port) {
 
-        if (tab.title.indexOf('vk.com/feed') > -1 && changeInfo.status === "loading") {
-            chrome.tabs.executeScript(tab.id, { file: 'file.js' });
+    port.onMessage.addListener(function(request) {
+        if(request.msg === 'getAccess'){
+            vkRequest.auth({
+                focusedTabId: request.tabId,
+                successCallback: function(token){
+                    port.postMessage({event:'getAccess',msg:"Ok",token:token});
+                },
+                errorCallback: function(){
+                    port.postMessage({event:'getAccess',msg:"Cancel"});
+                }
+            });
+        } else if(request.msg === 'getActiveTabId'){
+            chrome.tabs.query({active:true},function(tabs){
+                var actTab = null;
+                try {
+                    tabs.forEach(function (tab) {
+                        if (tab.url.indexOf('vk.com')) {
+                            actTab = tab;
+                            throw 'done'
+                        }
+                    });
+                } catch (e){
+                    if(e === 'done'){
+                        port.postMessage({event: 'getActiveTabId', tabId: actTab.id});
+                    }
+                }
+            })
+
         }
-    };
-}
-
-chrome.runtime.onMessage.addListener(
-    function (request, recipient, sendResponse) {
-        switch (request.msg){
-            case 'reinstallToken': vkRequest.auth(); sendResponse({msg:"Ok"});break;
-        }
-
     });
-
+});
 
 

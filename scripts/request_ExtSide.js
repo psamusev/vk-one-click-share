@@ -33,16 +33,21 @@ vkRequest.auth = function(callback){
                     authenticationTabId = null;
                     chrome.tabs.onUpdated.removeListener(tabUpdateListener);
 
-                    vkAccessToken = getUrlParameterValue(changeInfo.url, 'access_token');
+                    var urlString = changeInfo.url;
 
+                    vkAccessToken = getUrlParameterValue(urlString, 'access_token');
+                    chrome.tabs.remove(tabId);
+                    chrome.tabs.update(callback.focusedTabId, {active: true});
                     if (vkAccessToken === undefined || vkAccessToken.length === undefined) {
-                        alert('vk auth response problem access_token length = 0 or vkAccessToken == undefined');
+                        if(callback !== undefined) {
+                            callback.errorCallback();
+                        }
                         return;
                     }
 
-                    vkAccessTokenExpiredFlag = Number(getUrlParameterValue(changeInfo.url, 'expires_in'));
+                    vkAccessTokenExpiredFlag = Number(getUrlParameterValue(urlString, 'expires_in'));
 
-                    vkUserID = Number(getUrlParameterValue(changeInfo.url, 'user_id'));
+                    vkUserID = Number(getUrlParameterValue(urlString, 'user_id'));
 
                     vkRequest.OAuthURL = {
                         token:vkAccessToken,
@@ -50,12 +55,18 @@ vkRequest.auth = function(callback){
                         userId:vkUserID
                     };
 
-                    /*if (vkAccessTokenExpiredFlag !== 0) {
-                     alert('error');
-                     return;
-                     }*/
 
-                    chrome.storage.local.set({'vkAccessData': vkRequest.OAuthURL});
+
+                    chrome.storage.local.set({'vkAccessDataNew': vkRequest.OAuthURL});
+                    if(callback !== undefined) {
+                        callback.successCallback(vkAccessToken);
+                    }
+                } else if(changeInfo.url.indexOf('error=access_denied') > -1){
+                    chrome.tabs.remove(tabId);
+                    chrome.tabs.update(callback.focusedTabId, {active: true});
+                    if(callback) {
+                        callback.errorCallback();
+                    }
                 }
             }
         };
