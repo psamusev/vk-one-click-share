@@ -1,7 +1,63 @@
 /**
  * Created by Pavel on 10.05.2014.
  */
-function addShareToChatButton(){
+
+/***************View**********************/
+
+window.view = window.view || {};
+
+window.view.addShareToChatButton = function (){
+
+    function shareRecord(id_record){
+        var sendToWall = (localStorage.getItem('vk_send_flag') === 'wall');
+        var notifyTitle,notifyMessage;
+        if(sendToWall) {
+            notifyTitle = 'Record posted';
+            notifyMessage = 'Record has posted to your wall';
+            vkRequest.postRecord({
+                recordId: id_record
+            }, function (response) {
+                if (response.error) {
+                    if(response.error.error_code === 15){
+                        response.error.error_msg = "Record already posted: This record already posted to your wall."
+                    }
+                    notificationView.showErrorMessage(response.error);
+                } else {
+                    notificationView.showMessage(notifyTitle,notifyMessage);
+                    window.setTimeout(function () {
+                        $('#vkExtNotificationView').fadeOut(1500);
+                    }, 2000);
+                }
+            }, function (error) {
+                alert(error.error_msg);
+            });
+        } else {
+            var data = window.vkExtselectionData;
+            notifyTitle = 'Message sent';
+            notifyMessage = 'Your message has been sent';
+            vkRequest.sendRecord({
+                chat_id: data.id,
+                recordId: id_record,
+                chat_flag: data.chat
+            }, function (response) {
+                if (response.error) {
+                    if(response.error.error_code === 1){
+                        response.error.error_msg = "Message didn't send: This record can't be send. Please check 'sending option'"
+                    }
+                    notificationView.showErrorMessage(response.error);
+                } else {
+                    notificationView.showMessage(notifyTitle,notifyMessage);
+                    window.setTimeout(function () {
+                        $('#vkExtNotificationView').fadeOut(1500);
+                    }, 2000);
+                }
+
+            }, function (error) {
+                alert(error.error_msg);
+            });
+        }
+    }
+
     $('.post_full_like').each(function(i){
         var wallRecord = $(this);
         if(wallRecord.html().indexOf('shareToChat') <= -1) {
@@ -17,59 +73,9 @@ function addShareToChatButton(){
                 .appendTo(wallRecord);
         }
     });
-}
+};
 
-function shareRecord(id_record){
-    var sendToWall = (localStorage.getItem('vk_send_flag') === 'wall');
-    var notifyTitle,notifyMessage;
-    if(sendToWall) {
-        notifyTitle = 'Record posted';
-        notifyMessage = 'Record has posted to your wall';
-        vkRequest.postRecord({
-            recordId: id_record
-        }, function (response) {
-            if (response.error) {
-                if(response.error.error_code === 15){
-                    response.error.error_msg = "Record already posted: This record already posted to your wall."
-                }
-                showErrorMessage(response.error);
-            } else {
-                showNotificationMessage(notifyTitle,notifyMessage);
-                window.setTimeout(function () {
-                    $('#vkExtNotificationView').fadeOut(1500);
-                }, 2000);
-            }
-        }, function (error) {
-            alert(error.error_msg);
-        });
-    } else {
-        var data = window.vkExtselectionData;
-        notifyTitle = 'Message sent';
-        notifyMessage = 'Your message has been sent';
-        vkRequest.sendRecord({
-            chat_id: data.id,
-            recordId: id_record,
-            chat_flag: data.chat
-        }, function (response) {
-            if (response.error) {
-                if(response.error.error_code === 1){
-                    response.error.error_msg = "Message didn't send: This record can't be send. Please check 'sending option'"
-                }
-                showErrorMessage(response.error);
-            } else {
-                showNotificationMessage(notifyTitle,notifyMessage);
-                window.setTimeout(function () {
-                    $('#vkExtNotificationView').fadeOut(1500);
-                }, 2000);
-            }
-
-        }, function (error) {
-            alert(error.error_msg);
-        });
-    }
-}
-
-function addSettingsRegion(){
+window.view.addSettingsRegion = function (){
 
     var body = $('body');
     $("<div></div>",{id:'outerVkExtSettings'})
@@ -139,7 +145,7 @@ function addSettingsRegion(){
     });
 
     $('#addNewContactBtn').bind('click',function(){
-        showAddContactDialog();
+        view.showAddContactDialog();
     });
 
     $('#showContactListBtn').bind('click',function(){
@@ -148,7 +154,7 @@ function addSettingsRegion(){
             list.hide();
         } else{
             list.show();
-            filterList($('#vk_recipient').val());
+            recipientsStorage.filter($('#vk_recipient').val());
         }
         return false;
 
@@ -156,14 +162,14 @@ function addSettingsRegion(){
 
     $('#enableExtButton').click(function(){
         var showIconInterval = window.setInterval(function(){
-            if(window.chatList && window.contactList){
+            if(window.recipientsStorage.chats && window.recipientsStorage.contacts){
                 clearInterval(showIconInterval);
                 iconSetting.show();
             }
         },100);
 
         $('#vkExtEnablePanel').hide();
-        authorization();
+        app.authorization();
     });
 
     body.bind('mousedown',function(){
@@ -218,12 +224,12 @@ function addSettingsRegion(){
     $('#vk_recipient').bind('input',function(){
         $('.activeList > .notFound').hide();
         var chat_id = $(this).val();
-        filterList(chat_id);
+        recipientsStorage.filter(chat_id);
     });
 
     $('#vk_recipient').bind('focus',function(){
         $('.activeList').show();
-        filterList($('#vk_recipient').val());
+        recipientsStorage.filter($('#vk_recipient').val());
         return false;
     });
 
@@ -232,17 +238,9 @@ function addSettingsRegion(){
         $('#vkRecipientBlock').hide();
         chrome.storage.local.remove('vkChatData');
     });
-}
+};
 
-function addNotificationView(){
-    var body = $('body');
-    $("<div></div>",{id:'vkExtNotificationView',class:'vkExtNotificationView'})
-        .html('<div class="notification_title">Message sent</div>' +
-            '<div id="vkExtNotificationBody" class="notification_body">Your message has been sent</div>'
-    ).appendTo(body);
-}
-
-function addContactDialog(){
+window.view.addContactDialog = function (){
     $("<div></div>",{id:'contactDialog'})
         .html('<div class="box_dialog">' +
             '<div class="header">' +
@@ -315,27 +313,29 @@ function addContactDialog(){
                         .appendTo(resultContainer);
                     $('#addToContact').bind('click', {ID: item.uid}, function (event) {
                         var res = false;
-                        window.contactList.forEach(function (item) {
+                        window.recipientsStorage.contacts.forEach(function (item) {
                             if (item.uid === event.data.ID) {
                                 res = true;
                             }
                         });
                         if (res) {
                             $('#searchResult').children().children('.notify')
+                                .removeClass('notify_success_text')
                                 .addClass('notify_error_text')
                                 .text('This contact already added');
                         } else {
-                            window.contactList.push(item);
-                            chrome.storage.local.set({'vkContactList': window.contactList});
-                            var contactList = $('#contactList');
+                            window.recipientsStorage.contacts.push(item);
+                            chrome.storage.local.set({'vkContactList': window.recipientsStorage.contacts});
+                            var contactList = $('#contactList').find('> .mCustomScrollBox > .mCSB_container');
                             var contactListItem = $('<div class="contactListItem">' +
                                 '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
                                 + '</div>');
                             contactListItem.bind('click',{id:item.uid,title:item.first_name + ' ' + item.last_name,chat:false},function(event){
-                                selectListItem(event.data);
+                                recipientsStorage.selectItem(event.data);
                             });
                             contactList.append(contactListItem);
                             $('#searchResult').children().children('.notify')
+                                .removeClass('notify_error_text')
                                 .addClass('notify_success_text')
                                 .text('Contact added');
                         }
@@ -350,28 +350,89 @@ function addContactDialog(){
 
         })
     })
-}
+};
 
-function isLoginPage(){
-    return (document.getElementById('logout_link') === null);
-}
+window.view.addViewExt = function (){
+    view.addSettingsRegion();
+    notificationView.add();
+    window.recipientsStorage.chats = undefined;
+    window.recipientsStorage.contacts = undefined;
+};
 
-function selectListItem(data){
-    showRecipientTitle(data.title);
+window.view.showAddContactDialog = function (){
+    $('#box_layer_wrap').css('background-color','rgba(0,0,0,0.5)').show();
+    $('#contactDialog').show();
+};
+
+
+/***************Notification**********************/
+
+window.notificationView = window.notificationView || {};
+
+window.notificationView.add = function (){
+    var body = $('body');
+    $("<div></div>",{id:'vkExtNotificationView',class:'vkExtNotificationView'})
+        .html('<div class="notification_title">Message sent</div>' +
+            '<div id="vkExtNotificationBody" class="notification_body">Your message has been sent</div>'
+    ).appendTo(body);
+};
+
+window.notificationView.showErrorMessage = function (error){
+    var errorTitle = error.error_msg.replace(/:.+/g,'');
+    var errorMessage = error.error_msg.replace(/.+:/g,'').trim() + '<br>';
+    var body = $('body');
+    var message = $("<div></div>",{class:'vkExtNotificationView errorNotify'})
+        .html('<div class="notification_title">' + errorTitle + '</div>' +
+            '<div id="vkExtNotificationBody" class="notification_body">' + errorMessage + 'Click any place to close this message(it will be automatically closed after 5 sec.)</div>'
+    ).appendTo(body);
+
+    function closeErrorNotification(){
+        body.unbind('click',function(){
+            closeErrorNotification();
+        });
+        message.fadeOut(1500,function(){
+            message.remove();
+        });
+    }
+
+    body.bind('click',function(){
+        closeErrorNotification();
+    });
+
+    window.setTimeout(function(){
+        closeErrorNotification();
+    },5000);
+
+};
+
+window.notificationView.showMessage = function (title, message){
+    var view = $('#vkExtNotificationView');
+    view.children('.notification_title').text(title);
+    view.children('.notification_body').text(message);
+    view.show();
+};
+
+/***************Storage**********************/
+
+window.recipientsStorage = window.recipientsStorage || {};
+
+
+window.recipientsStorage.selectItem = function (data){
+    recipientsStorage.showRecipientTitle(data.title);
     chrome.storage.local.set({'vkChatData': data}, function() {
         localStorage.setItem('vk_chat_id',data.id);
     });
     window.vkExtselectionData = data;
     $('.activeList').hide();
-}
+};
 
-function showRecipientTitle(title){
+window.recipientsStorage.showRecipientTitle = function (title){
     var recBlock = $('#vkRecipientBlock');
     recBlock.children('#selectedListItem').children('.text').text(title);
     recBlock.show();
-}
+};
 
-function filterList(val){
+window.recipientsStorage.filter = function (val){
     var list = $('.activeList > .mCustomScrollBox > .mCSB_container > .contactListItem');
     if(val === ''){
 
@@ -402,25 +463,32 @@ function filterList(val){
             $('.activeList > .mCustomScrollBox > .mCSB_container > .notFound').hide();
         }
     }
-}
+};
 
-function fillContactList(){
+window.recipientsStorage.loadContacts = function (){
     chrome.storage.local.get('vkContactList',function(result){
 
         function fill(items){
             var contactList = $('#contactList').find('> .mCustomScrollBox > .mCSB_container');
             items.forEach(function(item){
-                var contactListItem = $('<div class="contactListItem">' +
-                    '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
-                    + '</div>');
-                contactListItem.bind('click',{id:item.uid,title:item.first_name + ' ' + item.last_name,chat:false},function(event){
-                    selectListItem(event.data);
-                });
-                contactList.append(contactListItem);
+                if(item.deactivated === undefined){
+                    if(item.photo_50.indexOf('camera_50') > 0){
+                        item.photo_50 = item.photo_50.replace(/http/,'https');
+                    } else if(item.photo_50.indexOf('https') < 0){
+                        item.photo_50 = item.photo_50.replace(/http:\/\/cs/,'https://c').replace(/.vk.me/,'').replace(/https:\/\//,'https://pp.vk.me/');
+                    }
+                    var contactListItem = $('<div class="contactListItem">' +
+                        '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.first_name + ' ' + item.last_name + '</div>'
+                        + '</div>');
+                    contactListItem.bind('click',{id:item.uid,title:item.first_name + ' ' + item.last_name,chat:false},function(event){
+                        recipientsStorage.selectItem(event.data);
+                    });
+                    contactList.append(contactListItem);
+                }
             });
         }
 
-        //window.contactList = result.vkContactList;
+        //window.recipientsStorage.contacts = result.vkContactList;
         if(result.vkContactList === undefined){
             vkRequest.getFriends({
                 order:'hints',
@@ -431,32 +499,39 @@ function fillContactList(){
                 } else{
                     chrome.storage.local.set({'vkContactList': response.response});
                     fill(response.response);
-                    window.contactList = response.response;
+                    window.recipientsStorage.contacts = response.response;
                 }
             },function(error){
 
             })
         } else {
             fill(result.vkContactList);
-            window.contactList = result.vkContactList;
+            window.recipientsStorage.contacts = result.vkContactList;
         }
 
     });
-}
+};
 
-function fillChatList(){
+window.recipientsStorage.loadChats = function (){
     chrome.storage.local.get('vkChatList',function(result){
 
         function fill(items){
             var chatList = $('#chatList').find('> .mCustomScrollBox > .mCSB_container');
             items.forEach(function(item){
-                var chatListItem = $('<div class="contactListItem">' +
-                    '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.title + '</div>'
-                    + '</div>');
-                chatListItem.bind('click',{id:item.chatId,title:item.title,chat:true},function(event){
-                    selectListItem(event.data);
-                });
-                chatList.append(chatListItem);
+                if(item.deactivated === undefined) {
+                    if (item.photo_50.indexOf('camera_50') > 0) {
+                        item.photo_50 = item.photo_50.replace(/http/, 'https');
+                    } else if (item.photo_50.indexOf('https') < 0) {
+                        item.photo_50 = item.photo_50.replace(/http:\/\/cs/, 'https://c').replace(/.vk.me/, '').replace(/https:\/\//, 'https://pp.vk.me/');
+                    }
+                    var chatListItem = $('<div class="contactListItem">' +
+                        '<div class="inl_block"><img src="' + item.photo_50 + '"/> </div><div class="text_item">' + item.title + '</div>'
+                        + '</div>');
+                    chatListItem.bind('click', {id: item.chatId, title: item.title, chat: true}, function (event) {
+                        recipientsStorage.selectItem(event.data);
+                    });
+                    chatList.append(chatListItem);
+                }
             });
         }
 
@@ -479,60 +554,28 @@ function fillChatList(){
                     });
                     chrome.storage.local.set({'vkChatList': arrayChat});
                     fill(arrayChat);
-                    window.chatList = arrayChat;
+                    window.recipientsStorage.chats = arrayChat;
                 }
             },function(error){
 
             })
         } else {
             fill(result.vkChatList);
-            window.chatList = result.vkChatList;
+            window.recipientsStorage.chats = result.vkChatList;
         }
 
     });
-}
+};
 
-function showAddContactDialog(){
-    $('#box_layer_wrap').css('background-color','rgba(0,0,0,0.5)').show();
-    $('#contactDialog').show();
-}
+/***************App**********************/
 
-function showErrorMessage(error){
-    var errorTitle = error.error_msg.replace(/:.+/g,'');
-    var errorMessage = error.error_msg.replace(/.+:/g,'').trim() + '<br>';
-    var body = $('body');
-    var message = $("<div></div>",{class:'vkExtNotificationView errorNotify'})
-        .html('<div class="notification_title">' + errorTitle + '</div>' +
-            '<div id="vkExtNotificationBody" class="notification_body">' + errorMessage + 'Click any place to close this message(it will be automatically closed after 5 sec.)</div>'
-    ).appendTo(body);
+window.app = window.app || {};
 
-    function closeErrorNotification(){
-        body.unbind('click',function(){
-            closeErrorNotification();
-        });
-        message.fadeOut(1500,function(){
-            message.remove();
-        });
-    }
+window.app.isLoginPage = function (){
+    return (document.getElementById('logout_link') === null);
+};
 
-    body.bind('click',function(){
-       closeErrorNotification();
-    });
-
-    window.setTimeout(function(){
-        closeErrorNotification();
-    },5000);
-
-}
-
-function showNotificationMessage(title, message){
-    var view = $('#vkExtNotificationView');
-    view.children('.notification_title').text(title);
-    view.children('.notification_body').text(message);
-    view.show();
-}
-
-function authorization(){
+window.app.authorization = function (){
 /*    var vkObjectScript = document.scripts[0].textContent;
     var startI = vkObjectScript.indexOf('{');
     var endI = vkObjectScript.indexOf('}');
@@ -544,10 +587,10 @@ function authorization(){
             if (response.msg.toLowerCase() === 'ok') {
                 localStorage.setItem('auth_token', response.token);
                 window.setInterval(function () {
-                    addShareToChatButton();
+                    view.addShareToChatButton();
                 }, 1000);
 
-                start();
+                app.start();
             }
             port.disconnect();
         } else if(response.event === 'getActiveTabId'){
@@ -555,18 +598,18 @@ function authorization(){
         }
     });
 
-}
+};
 
-function start(){
-    addShareToChatButton();
-    addContactDialog();
-    fillContactList();
-    fillChatList();
+window.app.start = function (){
+    view.addShareToChatButton();
+    view.addContactDialog();
+    recipientsStorage.loadContacts();
+    recipientsStorage.loadChats();
 
     chrome.storage.local.get('vkChatData',function(result){
         if(result.vkChatData) {
             localStorage.setItem('vk_chat_id', result.vkChatData.id);
-            showRecipientTitle(result.vkChatData.title);
+            recipientsStorage.showRecipientTitle(result.vkChatData.title);
             window.vkExtselectionData = result.vkChatData;
         }
     });
@@ -592,30 +635,23 @@ function start(){
         localStorage.removeItem('vk_chat_id');
         localStorage.removeItem('vk_send_flag');
     })
-}
-
-function addViewExt(){
-    addSettingsRegion();
-    addNotificationView();
-    window.chatList = undefined;
-    window.contactList = undefined;
-}
+};
 
 $(document).ready(function () {
 
     var showExtInterval = window.setInterval(function(){
-        if(!isLoginPage()){
+        if(!app.isLoginPage()){
             clearInterval(showExtInterval);
             chrome.storage.local.get('vkAccessData', function (items) {
 
                 if (items.vkAccessData !== undefined) {
                     localStorage.setItem('auth_token', items.vkAccessData.token);
                     window.setInterval(function () {
-                        addShareToChatButton();
+                        view.addShareToChatButton();
                     }, 1000);
-                    start();
+                    app.start();
                 }
-                addViewExt();
+                view.addViewExt();
             })
 
         }
