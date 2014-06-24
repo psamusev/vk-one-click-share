@@ -1,8 +1,7 @@
-/**
- * Created by Pavel on 10.05.2014.
- */
+/***************Request**********************/
 
-vkRequest = window.vkRequest || {};
+
+window.vkRequest = window.vkRequest || {};
 
 vkRequest.getChat = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',

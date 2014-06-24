@@ -10,7 +10,7 @@
     ],
     "web_accessible_resources":[
         "images/share-icon-min.png",
-        "jquery.min.map",
+        "prod/jquery.min.map",
         "images/loading.gif",
         "images/delete.png"
     ],
@@ -20,14 +20,14 @@
         "128": "images/share-icon-128.png"
     },
     "background":{
-        "scripts":["scripts/request_ExtSide.js","scripts/background.js"],
+        "scripts":["js/background_scripts/authorization.js","js/background_scripts/background.js"],
         "persistent": false
     },
     "content_scripts": [
         {
             "matches": [ "http://vk.com/*" ,"https://vk.com/*"],
-            "js": ["jquery.min.js","jquery.mousewheel.min.js","jquery.mCustomScrollbar.concat.min.js","scripts/requests.js","scripts/view_content.js"],
-            "css" : ["jquery.mCustomScrollbar.css","content.css"]
+            "js": ["prod/vk-one-click-share.js"],
+            "css" : ["prod/vk-one-click-share.css"]
         }
     ]
 }

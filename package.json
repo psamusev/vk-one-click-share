@@ -1,0 +1,27 @@
+{
+    "name": "vk-one-click-share",
+    "version": "2.7.0",
+    "description": "This extension add to standart button share new = 'Click to share'",
+    "main": "gulpfile.js",
+    "dependencies": {
+        "gulp": "^3.8.1",
+        "gulp-concat": "*",
+        "gulp-uglify": "*",
+        "gulp-clean": "*",
+        "gulp-minify-css": "*"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/psamusev/vk-one-click-share.git"
+    },
+    "author": "psamusev",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/psamusev/vk-one-click-share/issues"
+    },
+    "homepage": "https://github.com/psamusev/vk-one-click-share"
+}
