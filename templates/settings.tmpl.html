@@ -1,0 +1,33 @@
+<div id="vkExtSettings" class="vkExtPanel">
+    <div class="itemSettings">
+        <div style="margin-top: 10px">Select "sending option":</div>
+        <div><input value="dialog" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Send to dialog</span></div>
+        <div><input value="chat" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Send to chat</span></div>
+        <div><input value="wall" type="radio" name="sendFlag"/> <span style="position: relative;top:-3px">Post to wall</span></div>
+        <div style="height: 33px">
+            <div id="vkRecipientBlock" style="display: none">
+                <div class="inl_block">Recipient: </div>
+                <div id="selectedListItem" class="inl_block btn">
+                    <div class="text inl_bl"></div><span class="remove"></span>
+                </div>
+            </div>
+        </div>
+        <div class="inputContainer">
+            <div id="showContactListBtn" class="input_arr"></div>
+            <input class="input_text" id="vk_recipient" type="text" name="recipient" placeholder="Enter user name"/>
+            <div id="contactList" class="popupList" style="display: none">
+                <div class="contactListItem notFound">Not found contact</div>
+            </div>
+            <div id="chatList" class="popupList" style="display: none">
+                <div class="contactListItem notFound">Not found chat</div>
+            </div>
+        </div>
+        <div class="btn" id="addNewContactBtn">Add new contact</div>
+    </div>
+</div>
+<div id="vkExtEnablePanel" class="vkExtPanel" style="float:right">
+    <div class="btn" id="enableExtButton">Launch</div>
+</div>
+<div class="vkExtIconSettings">
+    <image ></image>
+</div>

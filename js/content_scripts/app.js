@@ -1,3 +1,4 @@
+
 /***************App**********************/
 
 window.app = window.app || {};
@@ -41,12 +42,7 @@ window.app.authorization = function (){
 
 };
 
-window.app.start = function (){
-    view.addShareToChatButton();
-    view.addContactDialog();
-    recipientsStorage.loadContacts();
-    recipientsStorage.loadChats();
-
+window.app.loadStorageData = function(){
     chrome.storage.local.get('vkChatData',function(result){
         if(result.vkChatData) {
             localStorage.setItem('vk_chat_id', result.vkChatData.id);
@@ -65,6 +61,11 @@ window.app.start = function (){
         }
         localStorage.setItem('vk_send_flag',flag);
     });
+};
+
+window.app.start = function (){
+    view.addShareToChatButton();
+    contactDialogView.add();
 
     $('#logout_link').click(function(){
         chrome.storage.local.remove('vkAccessData');
@@ -80,24 +81,31 @@ window.app.start = function (){
 
 $(document).ready(function () {
 
-    var showExtInterval = window.setInterval(function(){
-        if(!app.isLoginPage()){
-            clearInterval(showExtInterval);
-            chrome.storage.local.get('vkAccessData', function (items) {
+    function run(){
+        chrome.storage.local.get('vkAccessData', function (items) {
 
-                if (items.vkAccessData !== undefined) {
-                    localStorage.setItem('auth_token', items.vkAccessData.token);
-                    window.setInterval(function () {
-                        view.addShareToChatButton();
-                    }, 1000);
-                    app.start();
-                }
-                view.addViewExt();
-            })
+            if (items.vkAccessData !== undefined) {
+                localStorage.setItem('auth_token', items.vkAccessData.token);
+                window.setInterval(function () {
+                    view.addShareToChatButton();
+                }, 1000);
+                app.start();
+            }
+            view.addViewExt();
+        })
+    }
 
-        }
+    if(!app.isLoginPage()){
+        run();
+    } else {
+        var showExtInterval = window.setInterval(function () {
+            if (!app.isLoginPage()) {
+                clearInterval(showExtInterval);
+                run();
+            }
 
-    },5000);
+        }, 5000);
+    }
 
 });
 

@@ -6,7 +6,7 @@ var gulp = require('gulp'),
     minifyCss = require('gulp-minify-css');
 
 var path = {
-    scripts: ['js/libs/*.js','js/libs/**/*.js','js/content_scripts/*.js'],
+    scripts: ['js/libs/*.js','js/libs/**/*.js','js/content_scripts/*.js','js/content_scripts/**/*.js'],
     css:['css/*.css'],
     build:'prod'
 };

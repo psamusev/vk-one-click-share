@@ -3,7 +3,7 @@
 
 window.vkRequest = window.vkRequest || {};
 
-vkRequest.getChat = function(data,successCallback,errorCallback){
+window.vkRequest.getChat = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
         method = 'messages.getChat?',
         chat_id = 'chat_id=' + data.id,
@@ -11,7 +11,7 @@ vkRequest.getChat = function(data,successCallback,errorCallback){
     var url = server + method + chat_id + access_token;
     request(url,successCallback,errorCallback);
 };
-vkRequest.getAllChats = function(data,successCallback,errorCallback){
+window.vkRequest.getAllChats = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
         method = 'messages.getDialogs?',
         count = 'count=' + data.count,
@@ -20,7 +20,7 @@ vkRequest.getAllChats = function(data,successCallback,errorCallback){
     request(url,successCallback,errorCallback);
 };
 
-vkRequest.findUser = function(data,successCallback,errorCallback){
+window.vkRequest.findUser = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
         method = 'users.get?',
         user_id = 'user_ids=' + data.id,
@@ -30,7 +30,7 @@ vkRequest.findUser = function(data,successCallback,errorCallback){
     request(url,successCallback,errorCallback);
 };
 
-vkRequest.getFriends = function(data,successCallback,errorCallback){
+window.vkRequest.getFriends = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
         method = 'friends.get?',
         order = 'order=' + data.order,
@@ -40,7 +40,7 @@ vkRequest.getFriends = function(data,successCallback,errorCallback){
     request(url,successCallback,errorCallback);
 };
 
-vkRequest.sendRecord = function(data,successCallback,errorCallback){
+window.vkRequest.sendRecord = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
         method = 'messages.send?',
         chat_id = (data.chat_flag)? 'chat_id=' + data.chat_id : 'user_id=' + data.chat_id,
@@ -50,7 +50,7 @@ vkRequest.sendRecord = function(data,successCallback,errorCallback){
     request(url,successCallback,errorCallback);
 };
 
-vkRequest.postRecord = function(data,successCallback,errorCallback){
+window.vkRequest.postRecord = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
         method = 'wall.repost?',
         access_token = '&access_token=' + localStorage.getItem('auth_token'),
@@ -59,7 +59,7 @@ vkRequest.postRecord = function(data,successCallback,errorCallback){
     request(url,successCallback,errorCallback);
 };
 
-vkRequest.storageSet = function(data,successCallback,errorCallback){
+window.vkRequest.storageSet = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
         method = 'storage.set?',
         key = 'key=' + data.key,
@@ -69,7 +69,7 @@ vkRequest.storageSet = function(data,successCallback,errorCallback){
     request(url,successCallback,errorCallback);
 };
 
-vkRequest.storageGet = function(data,successCallback,errorCallback){
+window.vkRequest.storageGet = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
         method = 'storage.get?',
         key = 'key=' + data.key,

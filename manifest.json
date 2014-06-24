@@ -12,7 +12,9 @@
         "images/share-icon-min.png",
         "prod/jquery.min.map",
         "images/loading.gif",
-        "images/delete.png"
+        "images/delete.png",
+        "templates/settings.tmpl.html",
+        "templates/contactDialog.tmpl.html"
     ],
     "icons": {
         "16": "images/share-icon-16.png",
