@@ -4,12 +4,16 @@ window.recipientsStorage = window.recipientsStorage || {};
 
 
 window.recipientsStorage.selectItem = function (data){
-    recipientsStorage.showRecipientTitle(data.title);
+    this.showRecipientTitle(data.title);
     chrome.storage.local.set({'vkChatData': data}, function() {
         localStorage.setItem('vk_chat_id',data.id);
     });
     window.vkExtselectionData = data;
     $('.activeList').hide();
+};
+
+window.recipientsStorage.getEmptyItem = function(){
+    return $('.activeList > .mCustomScrollBox > .mCSB_container > .notFound');
 };
 
 window.recipientsStorage.showRecipientTitle = function (title){
@@ -44,9 +48,9 @@ window.recipientsStorage.filter = function (val){
             }
         });
         if (countHide === list.length- 1) {
-            $('.activeList > .mCustomScrollBox > .mCSB_container > .notFound').show();
+            recipientsStorage.getEmptyItem().show();
         } else{
-            $('.activeList > .mCustomScrollBox > .mCSB_container > .notFound').hide();
+            recipientsStorage.getEmptyItem().hide();
         }
     }
 };
@@ -54,7 +58,7 @@ window.recipientsStorage.filter = function (val){
 window.recipientsStorage.addItem = function(list,item,modelId){
 
     if(item.deactivated === undefined){
-        item = window.model.map(item,modelId);
+        item = model.map(item,modelId);
         item.photo = app.convertImageToHttpsPath(item.photo);
         var listItem = $('<div class="contactListItem">' +
             '<div class="inl_block"><img src="' + item.photo + '"/> </div><div class="text_item">' + item.title + '</div>'

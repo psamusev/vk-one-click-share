@@ -340,7 +340,7 @@ window.view.addContactDialog = function (){
 };
 
 window.view.addViewExt = function (){
-    view.addSettingsRegion();
+    this.addSettingsRegion();
     notificationView.add();
     window.recipientsStorage.chats = undefined;
     window.recipientsStorage.contacts = undefined;

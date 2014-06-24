@@ -18,7 +18,7 @@ window.model.chatList = {
 };
 
 window.model.map = function(item,modelId){
-    var model = window.model[modelId];
+    var model = this[modelId];
     var resultItem = {};
     for(var name in model){
         if ('object' === typeof(model[name])) {

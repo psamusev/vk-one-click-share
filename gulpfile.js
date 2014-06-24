@@ -19,7 +19,7 @@ gulp.task('clean', function () {
 gulp.task('scripts-prod', ['clean'], function() {
     return gulp.src(path.scripts)
         .pipe(uglify({quote_keys:true}))
-        .pipe(concat('vk-one-click-share.min.js'))
+        .pipe(concat('vk-one-click-share.js'))
         .pipe(gulp.dest(path.build));
 });
 
@@ -31,7 +31,7 @@ gulp.task('scripts', ['clean'], function() {
 
 gulp.task('css-prod',['clean'],function(){
    return gulp.src(path.css)
-       .pipe(concat('vk-one-click-share.min.css'))
+       .pipe(concat('vk-one-click-share.css'))
        .pipe(minifyCss())
        .pipe(gulp.dest(path.build))
 });
