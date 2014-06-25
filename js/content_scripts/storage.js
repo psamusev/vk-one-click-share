@@ -5,11 +5,15 @@ window.recipientsStorage = window.recipientsStorage || {};
 
 
 window.recipientsStorage.selectItem = function (data){
-    this.showRecipientTitle(data.title);
-    chrome.storage.local.set({'vkChatData': data}, function() {
-        localStorage.setItem('vk_chat_id',data.id);
-    });
-    window.vkExtselectionData = data;
+    if(data) {
+        this.showRecipientTitle(data.title);
+        var value = {};
+        value['vk' + (data.name.charAt(0).toUpperCase() + data.name.substring(1)) + 'Data'] = data;
+        chrome.storage.local.set(value,function(response){
+            var s = 5;
+        });
+        window.vkExtselectionData[data.name] = data;
+    }
     $('.activeList').hide();
 };
 
@@ -21,6 +25,10 @@ window.recipientsStorage.showRecipientTitle = function (title){
     var recBlock = $('#vkRecipientBlock');
     recBlock.children('#selectedListItem').children('.text').text(title);
     recBlock.show();
+};
+
+window.recipientsStorage.hideRecipientTitle = function (title){
+    $('#vkRecipientBlock').hide();
 };
 
 window.recipientsStorage.filter = function (val){

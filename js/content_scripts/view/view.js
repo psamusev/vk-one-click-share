@@ -6,10 +6,10 @@ window.view = window.view || {};
 window.view.addShareToChatButton = function (){
 
     function shareRecord(id_record){
-        var sendToWall = (localStorage.getItem('vk_send_flag') === 'wall');
-        var notifyTitle = (sendToWall) ? 'Record posted' : 'Message sent';
-        var notifyMessage = (sendToWall) ? 'Record has posted to your wall' : 'Your message has been sent';
-        if(sendToWall) {
+        var sendFlag = localStorage.getItem('vk_send_flag')
+        var notifyTitle = (sendFlag === 'wall') ? 'Record posted' : 'Message sent';
+        var notifyMessage = (sendFlag === 'wall') ? 'Record has posted to your wall' : 'Your message has been sent';
+        if(sendFlag === 'wall') {
             vkRequest.postRecord({
                 recordId: id_record
             }, function (response) {
@@ -28,7 +28,7 @@ window.view.addShareToChatButton = function (){
                 alert(error.error_msg);
             });
         } else {
-            var data = window.vkExtselectionData;
+            var data = (sendFlag === 'dialog')? window.vkExtselectionData.contact : window.vkExtselectionData.chat;
             vkRequest.sendRecord({
                 chat_id: data.id,
                 recordId: id_record,

@@ -3,11 +3,11 @@
  */
 
 
-/*chrome.storage.local.get('vkAccessDataNew', function(items) {
-    if (items.vkAccessDataNew === undefined) {
-        vkRequest.auth();
+chrome.storage.local.get('vkChatData', function(items) {
+    if (items.vkChatData !== undefined && items.vkChatData.chat !== true) {
+        chrome.storage.local.remove('vkChatData');
     }
-});*/
+});
 
 chrome.runtime.onConnect.addListener(function(port) {
 

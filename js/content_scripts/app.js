@@ -2,6 +2,7 @@
 /***************App**********************/
 
 window.app = window.app || {};
+window.vkExtselectionData = window.vkExtselectionData || {};
 
 window.app.isLoginPage = function (){
     return (document.getElementById('logout_link') === null);
@@ -46,20 +47,29 @@ window.app.authorization = function (){
 };
 
 window.app.loadStorageData = function(){
-    chrome.storage.local.get('vkChatData',function(result){
+    chrome.storage.local.get(['vkChatData','vkContactData','vkSendFlag'],function(result){
         if(result.vkChatData) {
-            localStorage.setItem('vk_chat_id', result.vkChatData.id);
-            recipientsStorage.showRecipientTitle(result.vkChatData.title);
-            window.vkExtselectionData = result.vkChatData;
+            window.vkExtselectionData.chat = result.vkChatData;
         }
-    });
+        if(result.vkContactData){
+            window.vkExtselectionData.contact = result.vkContactData;
+        }
 
-    chrome.storage.local.get('vkSendFlag',function(result){
         var flag = (result.vkSendFlag !== undefined) ? result.vkSendFlag : 'wall';
         $('input:radio[name=sendFlag][value=' + flag + ']').attr('checked', 'checked');
         switch (flag){
-            case 'dialog': $('#contactList').addClass('activeList'); break;
-            case 'chat': $('#chatList').addClass('activeList'); break;
+            case 'dialog':
+                $('#contactList').addClass('activeList');
+                if(window.vkExtselectionData.contact){
+                    recipientsStorage.showRecipientTitle(window.vkExtselectionData.contact.title)
+                }
+                break;
+            case 'chat':
+                $('#chatList').addClass('activeList');
+                if(window.vkExtselectionData.chat){
+                    recipientsStorage.showRecipientTitle(window.vkExtselectionData.chat.title)
+                }
+                break;
             case 'wall': $('.inputContainer').hide();
         }
         localStorage.setItem('vk_send_flag',flag);
@@ -71,13 +81,8 @@ window.app.start = function (){
     contactDialogView.add();
 
     $('#logout_link').click(function(){
-        chrome.storage.local.remove('vkAccessData');
-        chrome.storage.local.remove('vkSendFlag');
-        chrome.storage.local.remove('vkChatData');
-        chrome.storage.local.remove('vkChatList');
-        chrome.storage.local.remove('vkContactList');
+        chrome.storage.local.clear();
         localStorage.removeItem('auth_token');
-        localStorage.removeItem('vk_chat_id');
         localStorage.removeItem('vk_send_flag');
     })
 };

@@ -89,16 +89,27 @@ window.settingsView.bindEvents = function(){
         $('.activeList').hide();
         var chat_flag = $(this).val();
         if(chat_flag === "chat"){
+
+            (window.vkExtselectionData.chat) ?
+                recipientsStorage.showRecipientTitle(window.vkExtselectionData.chat.title) :
+                recipientsStorage.hideRecipientTitle();
+
             $('#contactList').removeClass('activeList');
             $('#chatList').addClass('activeList');
             $('.inputContainer').show();
             $('#vk_recipient').attr('placeholder','Enter chat name');
         } else if(chat_flag === 'dialog'){
+
+            (window.vkExtselectionData.contact) ?
+                recipientsStorage.showRecipientTitle(window.vkExtselectionData.contact.title) :
+                recipientsStorage.hideRecipientTitle();
+
             $('#chatList').removeClass('activeList');
             $('#contactList').addClass('activeList');
             $('.inputContainer').show();
             $('#vk_recipient').attr('placeholder','Enter user name');
         } else{
+            recipientsStorage.hideRecipientTitle();
             $('.inputContainer').hide();
         }
         chrome.storage.local.set({'vkSendFlag':chat_flag}, function() {
@@ -138,8 +149,14 @@ window.settingsView.bindEvents = function(){
     });
 
     $('#vkRecipientBlock').children('#selectedListItem').children('.remove').bind('click',function(){
-        localStorage.setItem('vk_chat_id','');
         $('#vkRecipientBlock').hide();
-        chrome.storage.local.remove('vkChatData');
+        var flag = $('input:radio[name=sendFlag][value=' + localStorage.getItem('vk_send_flag') + ']').val();
+        if(flag === 'dialog') {
+            chrome.storage.local.remove('vkContactData');
+            window.vkExtselectionData.contact = undefined;
+        } else {
+            chrome.storage.local.remove('vkChatData');
+            window.vkExtselectionData.chat = undefined;
+        }
     });
 };

@@ -4,6 +4,7 @@
 window.model = window.model || {};
 
 window.model.contactList = {
+    name:'contact',
     id: {map: 'uid'},
     title: {map: ['first_name','last_name'], divider: ' '},
     photo: {map: 'photo_50'},
@@ -11,6 +12,7 @@ window.model.contactList = {
 };
 
 window.model.chatList = {
+    name:'chat',
     id: {map:'chatId'},
     title: {map:'title'},
     photo: {map:'photo_50'},
