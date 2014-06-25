@@ -33,6 +33,9 @@ window.app.authorization = function (){
                 }, 1000);
 
                 app.start();
+                recipientsStorage.loadContacts();
+                recipientsStorage.loadChats();
+                app.loadStorageData();
             }
             port.disconnect();
         } else if(response.event === 'getActiveTabId'){
