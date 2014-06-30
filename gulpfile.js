@@ -66,7 +66,7 @@ gulp.task('tempDir',['scripts-prod','css-prod'],function(){
     return merge(manifest,dist);
 });
 gulp.task('zip',['tempDir'],function(){
-    return gulp.src(['tmp/**/*'])
+    return gulp.src([path.tmp +'/**/*'])
         .pipe(zip('vk-one-click-share.zip'))
         .pipe(gulp.dest(path.publish));
 });
