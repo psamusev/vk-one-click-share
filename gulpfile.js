@@ -17,6 +17,13 @@ var path = {
     tmp:'tmp'
 };
 
+var dist = {
+    scripts:'vk-one-click-share.js',
+    css:'vk-one-click-share.css',
+    background_scripts:'background.js',
+    zip:'vk-one-click-share.zip'
+};
+
 gulp.task('clean', function () {
     return gulp.src(path.buildDir,{read:false})
         .pipe(clean());
@@ -25,34 +32,34 @@ gulp.task('clean', function () {
 gulp.task('scripts-prod', ['clean'], function() {
     var scriptsProd = gulp.src(path.scripts)
         .pipe(uglify({quote_keys:true}))
-        .pipe(concat('vk-one-click-share.js'))
+        .pipe(concat(dist.scripts))
         .pipe(gulp.dest(path.buildDir));
     var backScripts = gulp.src(path.backgroundScripts)
-        .pipe(concat('background.js'))
+        .pipe(concat(dist.background_scripts))
         .pipe(gulp.dest(path.buildDir));
     return merge(scriptsProd,backScripts);
 });
 
 gulp.task('scripts', ['clean'], function() {
     var scriptsDev = gulp.src(path.scripts)
-        .pipe(concat('vk-one-click-share.js'))
+        .pipe(concat(dist.scripts))
         .pipe(gulp.dest(path.buildDir));
     var backScripts = gulp.src(path.backgroundScripts)
-        .pipe(concat('background.js'))
+        .pipe(concat(dist.background_scripts))
         .pipe(gulp.dest(path.buildDir));
     return merge(scriptsDev,backScripts);
 });
 
 gulp.task('css-prod',['clean'],function(){
    return gulp.src(path.css)
-       .pipe(concat('vk-one-click-share.css'))
+       .pipe(concat(dist.css))
        .pipe(minifyCss())
        .pipe(gulp.dest(path.buildDir))
 });
 
 gulp.task('css',['clean'],function(){
     return gulp.src(path.css)
-        .pipe(concat('vk-one-click-share.css'))
+        .pipe(concat(dist.css))
         .pipe(gulp.dest(path.buildDir))
 });
 
@@ -67,7 +74,7 @@ gulp.task('tempDir',['scripts-prod','css-prod'],function(){
 });
 gulp.task('zip',['tempDir'],function(){
     return gulp.src([path.tmp +'/**/*'])
-        .pipe(zip('vk-one-click-share.zip'))
+        .pipe(zip(dist.zip))
         .pipe(gulp.dest(path.publish));
 });
 
