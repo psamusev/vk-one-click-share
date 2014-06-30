@@ -14,7 +14,9 @@ var path = {
     css:['css/*.css'],
     buildDir:'dist',
     publish:'publish',
-    tmp:'tmp'
+    tmp:'tmp',
+    images:'images',
+    templates:'templates'
 };
 
 var dist = {
@@ -70,8 +72,15 @@ gulp.task('tempDir',['scripts-prod','css-prod'],function(){
     var dist = gulp.src(path.buildDir + '/*')
         .pipe(newer(path.tmp +'/' + path.buildDir))
         .pipe(gulp.dest(path.tmp +'/' + path.buildDir));
-    return merge(manifest,dist);
+    var images = gulp.src(path.images + '/*')
+        .pipe(newer(path.tmp +'/' + path.images))
+        .pipe(gulp.dest(path.tmp +'/' +  path.images));
+    var templates = gulp.src(path.templates + '/*')
+        .pipe(newer(path.tmp +'/' + path.templates))
+        .pipe(gulp.dest(path.tmp +'/' +  path.templates));
+    return merge(manifest,dist,images,templates);
 });
+
 gulp.task('zip',['tempDir'],function(){
     return gulp.src([path.tmp +'/**/*'])
         .pipe(zip(dist.zip))

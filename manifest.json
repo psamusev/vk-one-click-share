@@ -10,7 +10,7 @@
     ],
     "web_accessible_resources":[
         "images/share-icon-min.png",
-        "prod/jquery.min.map",
+        "dist/jquery.min.map",
         "images/loading.gif",
         "images/delete.png",
         "templates/settings.tmpl.html",
