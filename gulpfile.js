@@ -6,7 +6,11 @@ var gulp = require('gulp'),
     clean = require('gulp-clean'),
     minifyCss = require('gulp-minify-css'),
     newer = require('gulp-newer'),
+    manifestFile = require('./manifest.json'),
+    jeditor = require("gulp-json-editor"),
     zip = require('gulp-zip');
+
+console.log(manifestFile.version);
 
 var path = {
     scripts: ['js/libs/*.js','js/libs/**/*.js','js/content_scripts/*.js','js/content_scripts/**/*.js'],
@@ -67,6 +71,16 @@ gulp.task('css',['clean'],function(){
 
 gulp.task('tempDir',['scripts-prod','css-prod'],function(){
     var manifest = gulp.src('manifest.json')
+        .pipe(jeditor(function(json){
+            var minor_version = Number(manifestFile.version.charAt(manifestFile.version.length - 1));
+            var major_version = Number(manifestFile.version.charAt(0));
+            if(minor_version + 1 == 10){
+                json.version = (major_version + 1) + ".0";
+            } else {
+                json.version = major_version + "." + (minor_version + 1);
+            }
+            return json;
+        }))
         .pipe(newer(path.tmp))
         .pipe(gulp.dest(path.tmp));
     var dist = gulp.src(path.buildDir + '/*')
