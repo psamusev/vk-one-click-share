@@ -13,7 +13,9 @@
 }
 
 div.shareToChat .post_share_icon{
-    background-position: 0 -11px !important;
+    background-position: 0 0 !important;
+    background-size:contain;
+    background-image: url('chrome-extension://__MSG_@@extension_id__/images/share-icon.png');
 }
 
 /*Settings popup style*/
@@ -301,3 +303,35 @@ div.text_item{
     display: inline;
 }
 
+.audio_list .shareMusic{
+    margin: 4px 6px 6px 0;
+}
+
+#pad_playlist .shareMusic{
+    margin-top: 4px;
+}
+
+.shareMusic .audio_share {
+    width: 20px;
+    height: 15px;
+    background-size:contain;
+    background-image: url('chrome-extension://__MSG_@@extension_id__/images/share-icon.png');
+}
+
+.shareMusic:hover{
+    opacity: 0.7 !important;
+}
+
+.over .shareMusic{
+    display: block;
+}
+
+.shareMusic{
+    display: none;
+}
+
+.shareMusic{
+    padding: 4px;
+    opacity: 0.4;
+    margin: 0;
+}

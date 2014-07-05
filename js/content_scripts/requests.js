@@ -45,7 +45,7 @@ window.vkRequest.sendRecord = function(data,successCallback,errorCallback){
         method = 'messages.send?',
         chat_id = (data.chat_flag)? 'chat_id=' + data.chat_id : 'user_id=' + data.chat_id,
         access_token = '&access_token=' + localStorage.getItem('auth_token'),
-        record = '&attachment=wall' + data.recordId;
+        record = '&attachment=' + data.record.type + data.record.id;
     var url = server + method + chat_id + record + access_token;
     request(url,successCallback,errorCallback);
 };
@@ -54,7 +54,7 @@ window.vkRequest.postRecord = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
         method = 'wall.repost?',
         access_token = '&access_token=' + localStorage.getItem('auth_token'),
-        record = '&object=wall' + data.recordId;
+        record = '&object' + data.record.type + data.record.id;
     var url = server + method + record + access_token;
     request(url,successCallback,errorCallback);
 };

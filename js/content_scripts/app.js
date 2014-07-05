@@ -30,7 +30,7 @@ window.app.authorization = function (){
             if (response.msg.toLowerCase() === 'ok') {
                 localStorage.setItem('auth_token', response.token);
                 window.setInterval(function () {
-                    view.addShareToChatButton();
+                    share.add();
                 }, 1000);
 
                 app.start();
@@ -77,7 +77,7 @@ window.app.loadStorageData = function(){
 };
 
 window.app.start = function (){
-    view.addShareToChatButton();
+    share.add();
     contactDialogView.add();
 
     $('#logout_link').click(function(){
@@ -95,7 +95,7 @@ $(document).ready(function () {
             if (items.vkAccessData !== undefined) {
                 localStorage.setItem('auth_token', items.vkAccessData.token);
                 window.setInterval(function () {
-                    view.addShareToChatButton();
+                    share.add();
                 }, 1000);
                 app.start();
             }
