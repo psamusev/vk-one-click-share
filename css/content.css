@@ -14,8 +14,11 @@
 
 div.shareToChat .post_share_icon{
     background-position: 0 0 !important;
-    background-size:contain;
-    background-image: url('chrome-extension://__MSG_@@extension_id__/images/share-icon.png');
+    background-size: contain !important;
+    background: url('chrome-extension://__MSG_@@extension_id__/images/share-icon.png');
+    height: 9px;
+    opacity: 1;
+    margin-top: 2px !important;
 }
 
 /*Settings popup style*/

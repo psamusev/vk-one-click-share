@@ -14,6 +14,7 @@
         "images/loading.gif",
         "images/delete.png",
         "images/share-icon-audio.png",
+        "images/share-icon.png",
         "templates/settings.tmpl.html",
         "templates/contactDialog.tmpl.html"
     ],
