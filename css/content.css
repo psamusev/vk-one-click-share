@@ -321,6 +321,10 @@ div.text_item{
     opacity: 0.7 !important;
 }
 
+.audio.no_actions.over .duration{
+    display: none !important;
+}
+
 .over .shareMusic{
     display: block;
 }
