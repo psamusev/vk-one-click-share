@@ -38,11 +38,7 @@ window.settingsView.bindEvents = function(){
 
     iconSetting.bind('click',function(){
         $(this).hide();
-        if(localStorage.getItem('auth_token')){
-            settings.show();
-        } else{
-            $('#vkExtEnablePanel').show();
-        }
+        settingsView.show();
 
         event.stopPropagation();
 
@@ -72,15 +68,16 @@ window.settingsView.bindEvents = function(){
             }
         },100);
 
-        $('#vkExtEnablePanel').hide();
+        settingsView.hide();
         app.authorization();
     });
 
     $('body').bind('mousedown',function(){
         if(!$(event.target).parents('.vkExtPanel')[0]
-            && $(event.target).attr("class") !== 'vkExtPanel'){
+            && $(event.target).attr("class") !== 'vkExtPanel'
+            && !$(event.target).parents('.vkExtIconSettings')[0]){
             iconSetting.show();
-            $('.vkExtPanel').hide();
+            settingsView.hide();
             $('.activeList').hide();
         }
     });
@@ -159,4 +156,22 @@ window.settingsView.bindEvents = function(){
             window.vkExtselectionData.chat = undefined;
         }
     });
+};
+
+window.settingsView.show = function (){
+    $('#outerVkExtSettings').css('z-index',1000);
+    if(localStorage.getItem('auth_token')){
+        $('#vkExtSettings').show();
+    } else{
+        $('#vkExtEnablePanel').show();
+    }
+};
+
+window.settingsView.hide = function (){
+    $('#outerVkExtSettings').css('z-index',0);
+    if(localStorage.getItem('auth_token')){
+        $('#vkExtSettings').hide();
+    } else{
+        $('#vkExtEnablePanel').hide();
+    }
 };
