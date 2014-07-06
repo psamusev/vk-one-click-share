@@ -312,9 +312,25 @@ div.text_item{
 
 .shareMusic .audio_share {
     width: 20px;
-    height: 15px;
+    height: 16px;
     background-size:contain;
-    background-image: url('chrome-extension://__MSG_@@extension_id__/images/share-icon.png');
+    background: url('chrome-extension://__MSG_@@extension_id__/images/share-icon-audio.png') 0 0;
+}
+
+.audio.current .shareMusic .audio_share{
+    background: url('chrome-extension://__MSG_@@extension_id__/images/share-icon-audio.png') 0 -26px;
+}
+
+.post_audio .audio.current .shareMusic .audio_share {
+    background: url('chrome-extension://__MSG_@@extension_id__/images/share-icon-audio.png') 0 0;
+}
+
+.wall_audio .audio.current .shareMusic .audio_share {
+    background: url('chrome-extension://__MSG_@@extension_id__/images/share-icon-audio.png') 0 0;
+}
+
+.audio.current .shareMusic:hover{
+    opacity: 1 !important;
 }
 
 .shareMusic:hover{
