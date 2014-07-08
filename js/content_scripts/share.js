@@ -8,57 +8,59 @@ window.share.add = function(){
     this.addToAudio();
 };
 
-window.share.shareRecord = function(id_record,type_record){
-    event.stopPropagation();
-    var sendFlag = localStorage.getItem('vk_send_flag')
-    var notifyTitle = (sendFlag === 'wall') ? 'Record posted' : 'Message sent';
-    var notifyMessage = (sendFlag === 'wall') ? 'Record has posted to your wall' : 'Your message has been sent';
-    if(sendFlag === 'wall') {
-        vkRequest.postRecord({
-            record: {
-                id:id_record,
-                type:type_record
-            }
-        }, function (response) {
+window.share.toWall = function(record,title,message){
+    var method = (record.type === 'wall') ? 'repostRecord' : 'postRecord';
+    vkRequest[method]({record:record},
+        function (response) {
             if (response.error) {
                 if(response.error.error_code === 15){
                     response.error.error_msg = "Record already posted: This record already posted to your wall."
                 }
                 notificationView.showErrorMessage(response.error);
             } else {
-                notificationView.showMessage(notifyTitle,notifyMessage);
+                notificationView.showMessage(title,message);
                 window.setTimeout(function () {
                     $('#vkExtNotificationView').fadeOut(1500);
                 }, 2000);
             }
         }, function (error) {
             alert(error.error_msg);
-        });
-    } else {
-        var data = (sendFlag === 'dialog')? window.vkExtselectionData.contact : window.vkExtselectionData.chat;
-        vkRequest.sendRecord({
-            chat_id: data.id,
-            record: {
-                id:id_record,
-                type:type_record
-            },
-            chat_flag: data.chat
-        }, function (response) {
-            if (response.error) {
-                if(response.error.error_code === 1){
-                    response.error.error_msg = "Message didn't send: This record can't be send. Please check 'sending option'"
-                }
-                notificationView.showErrorMessage(response.error);
-            } else {
-                notificationView.showMessage(notifyTitle,notifyMessage);
-                window.setTimeout(function () {
-                    $('#vkExtNotificationView').fadeOut(1500);
-                }, 2000);
-            }
+    });
+};
 
-        }, function (error) {
-            alert(error.error_msg);
-        });
+window.share.toUsers = function(record,sendFlag,title,message){
+    var data = (sendFlag === 'dialog')? window.vkExtselectionData.contact : window.vkExtselectionData.chat;
+    vkRequest.sendRecord({
+        chat_id: data.id,
+        record: record,
+        chat_flag: data.chat
+    }, function (response) {
+        if (response.error) {
+            if(response.error.error_code === 1){
+                response.error.error_msg = "Message didn't send: This record can't be send. Please check 'sending option'"
+            }
+            notificationView.showErrorMessage(response.error);
+        } else {
+            notificationView.showMessage(title,message);
+            window.setTimeout(function () {
+                $('#vkExtNotificationView').fadeOut(1500);
+            }, 2000);
+        }
+
+    }, function (error) {
+        alert(error.error_msg);
+    });
+};
+
+window.share.shareRecord = function(id_record,type_record){
+    event.stopPropagation();
+    var sendFlag = localStorage.getItem('vk_send_flag');
+    var notifyTitle = (sendFlag === 'wall') ? 'Record posted' : 'Message sent';
+    var notifyMessage = (sendFlag === 'wall') ? 'Record has been posted to your wall' : 'Your message has been sent';
+    if(sendFlag === 'wall') {
+        share.toWall({id:id_record,type:type_record},notifyTitle,notifyMessage);
+    } else {
+        share.toUsers({id:id_record,type:type_record},sendFlag,notifyTitle,notifyMessage);
     }
 };
 

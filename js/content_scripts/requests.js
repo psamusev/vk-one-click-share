@@ -50,11 +50,20 @@ window.vkRequest.sendRecord = function(data,successCallback,errorCallback){
     request(url,successCallback,errorCallback);
 };
 
-window.vkRequest.postRecord = function(data,successCallback,errorCallback){
+window.vkRequest.repostRecord = function(data,successCallback,errorCallback){
     var server = 'https://api.vk.com/method/',
         method = 'wall.repost?',
         access_token = '&access_token=' + localStorage.getItem('auth_token'),
-        record = '&object' + data.record.type + data.record.id;
+        record = '&object=' + data.record.type + data.record.id;
+    var url = server + method + record + access_token;
+    request(url,successCallback,errorCallback);
+};
+
+window.vkRequest.postRecord = function(data,successCallback,errorCallback){
+    var server = 'https://api.vk.com/method/',
+        method = 'wall.post?',
+        access_token = '&access_token=' + localStorage.getItem('auth_token'),
+        record = '&attachment=' + data.record.type + data.record.id;
     var url = server + method + record + access_token;
     request(url,successCallback,errorCallback);
 };
