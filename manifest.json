@@ -3,7 +3,7 @@
 
     "name": "vk one click share",
     "description": "This extension add to standart button share new = 'Click to share'",
-    "version": "2.8",
+    "version": "2.9.1",
 
     "permissions": [
         "tabs", "storage","http://*/*", "https://*/*"
